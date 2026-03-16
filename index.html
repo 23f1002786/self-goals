@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission HQ — 6-Month Placement Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111114;
+    --surface2: #18181c;
+    --border: #2a2a30;
+    --border2: #3a3a42;
+    --text: #e8e8ec;
+    --muted: #7a7a88;
+    --dim: #4a4a58;
+    --amber: #f0a000;
+    --amber-dim: #f0a00022;
+    --amber-mid: #f0a00044;
+    --green: #00c97a;
+    --green-dim: #00c97a18;
+    --blue: #4a9eff;
+    --blue-dim: #4a9eff18;
+    --purple: #a78bfa;
+    --purple-dim: #a78bfa18;
+    --pink: #f472b6;
+    --red: #f87171;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === NOISE TEXTURE === */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .4;
+  }
+
+  /* === LAYOUT === */
+  .app { position: relative; z-index: 1; display: flex; height: 100vh; }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .sidebar-top {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--dim);
+    font-family: var(--mono);
+    letter-spacing: .06em;
+  }
+
+  /* XP section in sidebar */
+  .xp-section { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+
+  .level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--amber-dim);
+    border: 1px solid var(--amber-mid);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .level-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+
+  .level-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .xp-bar-wrap {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+  }
+
+  .xp-bar-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 2px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .xp-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* NAV */
+  nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    border-left: 2px solid transparent;
+    transition: all .15s;
+    user-select: none;
+    letter-spacing: .01em;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+
+  .nav-item.active {
+    color: var(--amber);
+    border-left-color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    opacity: .7;
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 9px;
+    background: var(--surface2);
+    border-radius: 100px;
+    padding: 1px 6px;
+    color: var(--dim);
+  }
+
+  .nav-item.active .nav-badge {
+    background: var(--amber-mid);
+    color: var(--amber);
+  }
+
+  /* === MAIN === */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeUp .2s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === PAGE HEADER === */
+  .page-header { margin-bottom: 28px; }
+  .page-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .page-title span { color: var(--amber); }
+  .page-sub { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+  /* === CARDS === */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+
+  .card-sm {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--dim);
+    margin-bottom: 10px;
+  }
+
+  /* === STAT GRID === */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+  }
+
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.purple::before { background: var(--purple); }
+
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card.amber .stat-val { color: var(--amber); }
+  .stat-card.green .stat-val { color: var(--green); }
+  .stat-card.blue .stat-val { color: var(--blue); }
+  .stat-card.purple .stat-val { color: var(--purple); }
+
+  .stat-lbl { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .stat-sub { font-size: 10px; color: var(--dim); font-family: var(--mono); }
+
+  /* === PROGRESS BAR === */
+  .prog-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 6px 0;
+  }
+
+  .prog-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* === MONTH ACCORDION === */
+  .month-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: border-color .2s;
+  }
+
+  .month-block.open { border-color: var(--border2); }
+
+  .month-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+  }
+
+  .month-header:hover { background: var(--surface2); }
+
+  .month-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--border2);
+    width: 44px;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: color .2s;
+  }
+
+  .month-block.open .month-num { color: var(--amber); }
+  .month-block.complete .month-num { color: var(--green); }
+
+  .month-info { flex: 1; min-width: 0; }
+
+  .month-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .done-chip {
+    font-family: var(--mono);
+    font-size: 9px;
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid #00c97a33;
+    border-radius: 100px;
+    padding: 2px 8px;
+    font-weight: 400;
+  }
+
+  .month-sub { font-size: 12px; color: var(--muted); }
+
+  .month-right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .month-pct {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .month-count { font-size: 10px; color: var(--dim); font-family: var(--mono); }
+
+  .month-caret {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    margin-left: 8px;
+  }
+
+  .month-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 6px 20px 14px;
+  }
+
+  .month-block.open .month-body { display: block; }
+
+  .outcome-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    padding: 8px 0 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  /* === TASKS === */
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: opacity .15s;
+  }
+
+  .task-row:last-child { border-bottom: none; }
+  .task-row.done { opacity: .35; }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .task-check.on {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .task-text { flex: 1; font-size: 13px; line-height: 1.5; font-weight: 600; }
+  .task-row.done .task-text { text-decoration: line-through; color: var(--dim); }
+
+  .task-xp {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  /* === PROJECTS === */
+  .proj-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .proj-top {
+    padding: 20px 22px 16px;
+    border-left: 4px solid;
+  }
+
+  .proj-type { font-family: var(--mono); font-size: 10px; margin-bottom: 6px; opacity: .7; letter-spacing: .06em; text-transform: uppercase; }
+  .proj-title { font-size: 17px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.01em; }
+  .proj-tasks { padding: 0 22px 8px; border-top: 1px solid var(--border); }
+
+  /* === SKILLS === */
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-row:last-child { border-bottom: none; }
+
+  .skill-name { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; }
+  .skill-tag {
+    font-size: 10px;
+    color: var(--dim);
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+
+  .skill-pct {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 110px;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    transition: transform .1s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    border: none;
+  }
+
+  .skill-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--dim);
+    padding: 16px 0 6px;
+  }
+
+  /* === LOG === */
+  .form-label { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; letter-spacing: .04em; }
+
+  input[type=text], input[type=number], textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color .15s;
+    -moz-appearance: textfield;
+  }
+
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type=text]:focus, input[type=number]:focus, textarea:focus { border-color: var(--amber); }
+
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--amber);
+    border: none;
+    border-radius: var(--radius);
+    color: #0a0a0c;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: .02em;
+    transition: opacity .15s, transform .1s;
+    margin-top: 10px;
+  }
+
+  .btn:hover { opacity: .88; }
+  .btn:active { transform: scale(.98); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover { color: var(--text); background: var(--surface2); opacity: 1; }
+
+  .log-entry {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+
+  .log-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .log-date { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+  .log-hours { font-family: var(--mono); font-size: 11px; }
+  .log-insight { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* === ALERT === */
+  .alert {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .alert-amber { background: var(--amber-dim); border: 1px solid var(--amber-mid); color: #f0a000cc; }
+  .alert-green { background: var(--green-dim); border: 1px solid #00c97a33; color: #00c97acc; }
+
+  .alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .alert-amber .alert-dot { background: var(--amber); }
+  .alert-green .alert-dot { background: var(--green); }
+
+  /* === TOAST === */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 11px 16px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--amber);
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+    max-width: 240px;
+    box-shadow: 0 4px 24px #00000060;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* === GRID HELPERS === */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* === DIVIDER === */
+  .div { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* === COMPANY TAG === */
+  .co-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--muted);
+    margin: 3px;
+    cursor: default;
+  }
+
+  /* === SCROLL BAR in sidebar === */
+  nav::-webkit-scrollbar { width: 2px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    .sidebar { width: 56px; }
+    .sidebar .logo, .sidebar .logo-sub, .xp-section .level-title,
+    .xp-section .xp-label, .nav-item span, .nav-badge { display: none; }
+    .nav-item { padding: 12px; justify-content: center; }
+    .sidebar-top { padding: 16px 12px; }
+    .main { padding: 20px 16px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    input[type=range] { width: 80px; }
+    .skill-tag { display: none; }
+  }
+
+  /* === WEEK RULE BAR === */
+  .rule-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon { font-family: var(--mono); font-size: 11px; color: var(--amber); width: 18px; flex-shrink: 0; }
+
+  /* === PROGRESS RING (mini) === */
+  .overall-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .big-pct {
+    font-family: var(--mono);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+
+  .big-pct-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* month bars on dash */
+  .mbar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 7px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .mbar-lbl { color: var(--dim); width: 22px; flex-shrink: 0; }
+  .mbar-wrap { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .mbar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+  .mbar-pct { color: var(--muted); width: 32px; text-align: right; flex-shrink: 0; }
+
+  /* next-up tasks */
+  .next-task {
+    display: flex;
+    gap: 9px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .next-task:last-child { border-bottom: none; }
+  .next-arrow { color: var(--amber); font-family: var(--mono); font-size: 11px; flex-shrink: 0; padding-top: 2px; }
+
+  /* weekly habit dots */
+  .habit-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .hday { width: 14px; height: 14px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; transition: background .15s; }
+  .hday.on { background: var(--green); border-color: var(--green); }
+  .hday.amber-on { background: var(--amber); border-color: var(--amber); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">Mission HQ</div>
+      <div class="logo-sub">6-month protocol</div>
+    </div>
+
+    <div class="xp-section" id="xp-section">
+      <div class="level-badge"><div class="level-dot"></div><span id="sb-lv">Lv 1</span></div>
+      <div class="level-title" id="sb-title">Curious beginner</div>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="sb-bar" style="width:0%"></div></div>
+      <div class="xp-label"><span id="sb-xp">0</span><span id="sb-pct">0%</span><span id="sb-next">300</span></div>
+    </div>
+
+    <nav>
+      <div class="nav-item active" data-tab="dashboard">
+        <span class="nav-icon">⊞</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-tab="roadmap">
+        <span class="nav-icon">◈</span>
+        <span>Roadmap</span>
+        <span class="nav-badge" id="nb-roadmap">0%</span>
+      </div>
+      <div class="nav-item" data-tab="projects">
+        <span class="nav-icon">◉</span>
+        <span>Projects</span>
+        <span class="nav-badge" id="nb-projects">0%</span>
+      </div>
+      <div class="nav-item" data-tab="skills">
+        <span class="nav-icon">◎</span>
+        <span>Skills</span>
+        <span class="nav-badge" id="nb-skills">0%</span>
+      </div>
+      <div class="nav-item" data-tab="log">
+        <span class="nav-icon">◷</span>
+        <span>Log</span>
+        <span class="nav-badge" id="nb-log">0h</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="page-header">
+        <div class="page-title">Mission <span>Control</span></div>
+        <div class="page-sub">Your 6-month placement command center</div>
+      </div>
+
+      <div class="stat-grid" id="dash-stats">
+        <div class="stat-card amber">
+          <div class="stat-val" id="ds-tasks">0/48</div>
+          <div class="stat-lbl">Tasks done</div>
+          <div class="stat-sub" id="ds-tasks-sub">0% complete</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-val" id="ds-proj">0%</div>
+          <div class="stat-lbl">Project milestones</div>
+          <div class="stat-sub" id="ds-proj-sub">0/22 complete</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-val" id="ds-co">0</div>
+          <div class="stat-lbl">Companies analyzed</div>
+          <div class="stat-sub">Target: 25 over 6 months</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-val" id="ds-hours">0h</div>
+          <div class="stat-lbl">Hours logged</div>
+          <div class="stat-sub">Target: 15+ per week</div>
+        </div>
+      </div>
+
+      <!-- overall + month bars -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;">
+          <div>
+            <div class="card-label">Overall progress</div>
+            <div class="big-pct" id="dash-pct">0%</div>
+            <div class="big-pct-sub" id="dash-pct-sub">Just getting started</div>
+          </div>
+          <div style="text-align:right;padding-bottom:4px;">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:4px;">XP earned</div>
+            <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);" id="dash-xp">0</div>
+          </div>
+        </div>
+        <div id="dash-month-bars"></div>
+      </div>
+
+      <!-- next up -->
+      <div class="card">
+        <div class="card-label" id="dash-focus-lbl">Current focus — Month 1</div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:2px;" id="dash-month-title">Foundation</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;" id="dash-month-sub">Excel mastery & SQL basics</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Next up</div>
+        <div id="dash-nextup"></div>
+      </div>
+
+      <!-- weekly rules -->
+      <div class="card">
+        <div class="card-label">Weekly non-negotiables</div>
+        <div class="rule-row"><div class="rule-icon">→</div><div>15 focused hours minimum <span style="font-family:var(--mono);font-size:10px;color:var(--dim);">(8 learning + 7 project)</span></div></div>
+        <div class="rule-row"><div class="rule-icon">→</div><div>1 company analyzed deeply every week</div></div>
+        <div class="rule-row"><div class="rule-icon">→</div><div>roadmap.sh progress, at least one section</div></div>
+        <div class="rule-row"><div class="rule-icon">→</div><div>No new courses until current ones are done</div></div>
+      </div>
+
+      <div class="alert alert-amber">
+        <div class="alert-dot"></div>
+        <div><strong>Depth beats activity.</strong> Your biggest enemy is distraction — new courses, random internships, unnecessary certifications. If you keep switching, you finish 6 months with half-built skills and weak projects.</div>
+      </div>
+    </div>
+
+    <!-- ===== ROADMAP ===== -->
+    <div class="tab-content" id="tab-roadmap">
+      <div class="page-header">
+        <div class="page-title">6-Month <span>Roadmap</span></div>
+        <div class="page-sub">Click a month to expand — check tasks to earn XP</div>
+      </div>
+      <div id="roadmap-list"></div>
+    </div>
+
+    <!-- ===== PROJECTS ===== -->
+    <div class="tab-content" id="tab-projects">
+      <div class="page-header">
+        <div class="page-title">Portfolio <span>Projects</span></div>
+        <div class="page-sub">4 serious projects that demonstrate real capability</div>
+      </div>
+      <div id="projects-list"></div>
+    </div>
+
+    <!-- ===== SKILLS ===== -->
+    <div class="tab-content" id="tab-skills">
+      <div class="page-header">
+        <div class="page-title">Skill <span>Tracker</span></div>
+        <div class="page-sub">Rate yourself honestly — earn 20 XP at every 25% milestone</div>
+      </div>
+
+      <div class="card">
+        <div class="skill-section-label">Priority 1 — Non-negotiable (core placement skills)</div>
+        <div id="skills-p1"></div>
+        <div class="skill-section-label">Priority 2 — Differentiators</div>
+        <div id="skills-p2"></div>
+        <div class="skill-section-label">Priority 3 — Nice to have</div>
+        <div id="skills-p3"></div>
+        <div class="skill-section-label">Extra — Your unique edge</div>
+        <div id="skills-extra"></div>
+      </div>
+    </div>
+
+    <!-- ===== LOG ===== -->
+    <div class="tab-content" id="tab-log">
+      <div class="page-header">
+        <div class="page-title">Daily <span>Log</span></div>
+        <div class="page-sub">Track hours and companies analyzed — accountability builds discipline</div>
+      </div>
+
+      <div class="grid-2" style="align-items:start;">
+        <!-- Hours card -->
+        <div class="card">
+          <div class="card-label">Log today's hours</div>
+          <div class="grid-2">
+            <div>
+              <div class="form-label">Learning (hrs)</div>
+              <input type="number" id="log-l" min="0" max="16" step="0.5" placeholder="0">
+            </div>
+            <div>
+              <div class="form-label">Project work (hrs)</div>
+              <input type="number" id="log-p" min="0" max="16" step="0.5" placeholder="0">
+            </div>
+          </div>
+          <button class="btn" id="log-btn">Log hours → +XP</button>
+          <div class="div"></div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">Recent sessions</div>
+          <div id="hours-log-list"></div>
+        </div>
+
+        <!-- Company card -->
+        <div class="card">
+          <div class="card-label">Company analysis</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Analyze 1 company/week. Ask: how does it make money? Growth strategy? Weakness? What would you change?</div>
+          <div class="form-label">Company name</div>
+          <input type="text" id="co-name" placeholder="e.g. Zerodha, Swiggy, Notion...">
+          <div class="form-label" style="margin-top:10px;">Key insight</div>
+          <textarea id="co-insight" placeholder="Revenue model, growth strategy, weakness you spotted..."></textarea>
+          <button class="btn" id="co-btn">Add analysis → +25 XP</button>
+          <div class="div"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;">Companies analyzed</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--amber);" id="co-count">0 / 25</div>
+          </div>
+          <div class="prog-wrap"><div class="prog-fill" id="co-bar" style="width:0%;background:var(--amber);"></div></div>
+          <div id="co-list" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const MONTHS = [
+  {id:1,n:"01",title:"Foundation",sub:"Excel mastery & SQL basics",out:"Dataset exploration complete",tasks:[
+    {id:"1-1",t:"Master Excel: pivots, VLOOKUP, INDEX/MATCH, dynamic charts",cat:"core"},
+    {id:"1-2",t:"SQL basics: SELECT, WHERE, JOINs, GROUP BY, HAVING",cat:"core"},
+    {id:"1-3",t:"Download and explore a Kaggle retail/e-commerce dataset",cat:"core"},
+    {id:"1-4",t:"roadmap.sh: start the data analyst learning path",cat:"core"},
+    {id:"1-5",t:"Stats & maths: descriptive stats — mean, median, std dev, percentiles",cat:"extra"},
+    {id:"1-6",t:"AI/ML core: Python refresh, NumPy and Pandas fundamentals",cat:"extra"},
+    {id:"1-7",t:"LeetCode: arrays & strings — 5 easy problems",cat:"extra"},
+    {id:"1-8",t:"Company analysis: analyze 4 companies this month (1 per week)",cat:"habit"},
+  ]},
+  {id:2,n:"02",title:"Data fluency",sub:"SQL queries & dashboard building",out:"Project 1 — E-commerce analysis complete",tasks:[
+    {id:"2-1",t:"Advanced SQL: subqueries, window functions, CTEs",cat:"core"},
+    {id:"2-2",t:"Build Excel dashboard with 4+ KPI cards and charts",cat:"core"},
+    {id:"2-3",t:"Write 5–8 business insights in report format",cat:"core"},
+    {id:"2-4",t:"roadmap.sh: SQL deep-dive section complete",cat:"core"},
+    {id:"2-5",t:"Stats: probability, Bayes theorem, distributions",cat:"extra"},
+    {id:"2-6",t:"AI/ML: linear & logistic regression from scratch in Python",cat:"extra"},
+    {id:"2-7",t:"LeetCode: hashing & two pointers — 10 problems",cat:"extra"},
+    {id:"2-8",t:"Company analysis: 4 companies this month",cat:"habit"},
+  ]},
+  {id:3,n:"03",title:"Strategy layer",sub:"Market research methods",out:"Project 2 — Market research report complete",tasks:[
+    {id:"3-1",t:"Market sizing frameworks: TAM, SAM, SOM — with practice problems",cat:"core"},
+    {id:"3-2",t:"Competitive analysis: Porter's 5 Forces, SWOT, Blue Ocean",cat:"core"},
+    {id:"3-3",t:"Write 10–12 page AI skincare industry report",cat:"core"},
+    {id:"3-4",t:"roadmap.sh: business intelligence tools section",cat:"core"},
+    {id:"3-5",t:"Stats: regression analysis, correlation, R², residuals",cat:"extra"},
+    {id:"3-6",t:"AI/ML: decision trees, random forests, XGBoost — implement + tune",cat:"extra"},
+    {id:"3-7",t:"AI Agents: ReAct loop, tool-calling, function calling",cat:"extra"},
+    {id:"3-8",t:"LeetCode: sliding window & binary search — 10 problems",cat:"extra"},
+  ]},
+  {id:4,n:"04",title:"Product mind",sub:"Product thinking & teardown",out:"Project 3 — Product teardown deck complete",tasks:[
+    {id:"4-1",t:"Study CIRCLES framework, jobs-to-be-done, north star metric",cat:"core"},
+    {id:"4-2",t:"Complete 12–15 slide product teardown deck (Zerodha/Notion/Swiggy)",cat:"core"},
+    {id:"4-3",t:"Learn Power BI or Tableau — basics to intermediate",cat:"core"},
+    {id:"4-4",t:"roadmap.sh: product analytics section complete",cat:"core"},
+    {id:"4-5",t:"AI/ML: neural networks, backprop, activation functions — implement",cat:"extra"},
+    {id:"4-6",t:"AI Agents: build a simple agent with LangChain or CrewAI",cat:"extra"},
+    {id:"4-7",t:"LeetCode: trees & graphs — 10 easy-medium problems",cat:"extra"},
+    {id:"4-8",t:"LinkedIn outreach: connect with 20+ professionals this month",cat:"habit"},
+  ]},
+  {id:5,n:"05",title:"Growth engine",sub:"Growth metrics & experiments",out:"Project 4 — Growth case study complete",tasks:[
+    {id:"5-1",t:"Master AARRR funnel, cohort retention, LTV/CAC, DAU/MAU",cat:"core"},
+    {id:"5-2",t:"Write Swiggy user retention growth case study",cat:"core"},
+    {id:"5-3",t:"Design 3 A/B experiment hypotheses with estimated impact",cat:"core"},
+    {id:"5-4",t:"Stats: A/B testing, p-values, confidence intervals, statistical power",cat:"extra"},
+    {id:"5-5",t:"AI/ML: CNNs, RNNs, Transformers — concept + hands-on implementation",cat:"extra"},
+    {id:"5-6",t:"AI Agents: multi-agent orchestration, memory, RAG basics",cat:"extra"},
+    {id:"5-7",t:"LeetCode: dynamic programming — 10 easy-medium problems",cat:"extra"},
+    {id:"5-8",t:"LinkedIn: 5 outreach messages/week, target 2 coffee chats",cat:"habit"},
+  ]},
+  {id:6,n:"06",title:"Launch mode",sub:"Resume, portfolio & interviews",out:"Placement ready",tasks:[
+    {id:"6-1",t:"Build Notion portfolio — all 4 projects polished and linked",cat:"core"},
+    {id:"6-2",t:"Write evidence-based resume — specific numbers, zero fluff",cat:"core"},
+    {id:"6-3",t:"Complete 10 mock interviews (product, analytics, guesstimate)",cat:"core"},
+    {id:"6-4",t:"Research and target 20+ companies — personalized notes",cat:"core"},
+    {id:"6-5",t:"Apply to 30+ roles via LinkedIn, startup boards, referrals",cat:"core"},
+    {id:"6-6",t:"AI/ML: complete end-to-end ML project for portfolio",cat:"extra"},
+    {id:"6-7",t:"AI Agents: showcase agent project — demo ready",cat:"extra"},
+    {id:"6-8",t:"LeetCode: SQL coding rounds + mock technical screens",cat:"extra"},
+  ]},
+];
+
+const PROJECTS = [
+  {id:1,span:"Months 1–2",title:"E-commerce sales analysis",type:"Data analysis",col:"#4a9eff",tasks:[
+    "Download and explore retail dataset from Kaggle or public source",
+    "Clean data: handle nulls, fix data types, remove duplicates",
+    "Write 10+ SQL queries to surface revenue patterns and segments",
+    "Build Excel/Power BI dashboard with 4+ visualizations",
+    "Write 5–8 business insights formatted as a report",
+  ]},
+  {id:2,span:"Months 2–3",title:"AI skincare industry analysis",type:"Market research",col:"#a78bfa",tasks:[
+    "Estimate TAM, SAM, SOM for AI skincare market",
+    "Profile 5+ competitors: positioning, pricing, moat",
+    "Map pricing models across major players",
+    "Identify 3+ white-space / opportunity gaps",
+    "Write polished 10–12 page industry report",
+  ]},
+  {id:3,span:"Months 3–4",title:"Product teardown deck",type:"Product thinking",col:"#f472b6",tasks:[
+    "Pick product: Zerodha, Notion, Swiggy, or Spotify",
+    "Define target users and core jobs-to-be-done",
+    "Map key features and primary user flows",
+    "Analyze monetization model in detail",
+    "Identify 3 specific improvements with reasoning",
+    "Build 12–15 polished slides",
+  ]},
+  {id:4,span:"Month 5",title:"Swiggy user retention case study",type:"Growth case",col:"#00c97a",tasks:[
+    "Map Swiggy's complete user acquisition to retention funnel",
+    "Identify top 3 drop-off points with data-backed reasoning",
+    "Design 3 A/B experiment hypotheses with clear success metrics",
+    "Estimate retention lift and estimated revenue impact",
+    "Write final growth case study document",
+  ]},
+];
+
+const SKILLS = [
+  {id:"sql",l:"SQL",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
+  {id:"excel",l:"Advanced Excel",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
+  {id:"data_i",l:"Data interpretation",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
+  {id:"prob_s",l:"Structured problem solving",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
+  {id:"prod_t",l:"Product thinking",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
+  {id:"mkt_r",l:"Market research",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
+  {id:"biz_m",l:"Business model analysis",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
+  {id:"python",l:"Python for data",t:"P3 — If time permits",p:3,col:"#4a9eff"},
+  {id:"bi",l:"Power BI / Tableau",t:"P3 — If time permits",p:3,col:"#4a9eff"},
+  {id:"figma",l:"Figma (basic)",t:"P3 — If time permits",p:3,col:"#4a9eff"},
+  {id:"ml_c",l:"AI/ML core theory",t:"Extra — strong edge",p:4,col:"#f472b6"},
+  {id:"ml_i",l:"ML implementation",t:"Extra — strong edge",p:4,col:"#f472b6"},
+  {id:"agents",l:"AI Agents",t:"Extra — future-proof",p:4,col:"#f472b6"},
+  {id:"lcode",l:"LeetCode / DSA",t:"Extra — tech + analytics",p:4,col:"#f472b6"},
+  {id:"stats",l:"Statistics & maths",t:"Extra — foundation",p:4,col:"#f472b6"},
+];
+
+const LEVELS = [
+  {lv:1,t:"Curious beginner",min:0,max:300},
+  {lv:2,t:"Aspiring analyst",min:300,max:700},
+  {lv:3,t:"Junior analyst",min:700,max:1200},
+  {lv:4,t:"Competent analyst",min:1200,max:2000},
+  {lv:5,t:"Market-ready",min:2000,max:3000},
+  {lv:6,t:"Placement ready",min:3000,max:3001},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let S = {
+  checked: {},
+  projDone: {},
+  skills: {},
+  companies: [],
+  hoursLog: [],
+  xp: 0,
+  openMonth: null,
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('mhq_v3');
+    if (raw) Object.assign(S, JSON.parse(raw));
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('mhq_v3', JSON.stringify(S)); } catch(e) {}
+}
+
+// ============================================================
+// XP / LEVELS
+// ============================================================
+function getLevelInfo() {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (S.xp >= LEVELS[i].min) {
+      const l = LEVELS[i], nx = LEVELS[i+1];
+      const pct = nx ? Math.min(100, Math.round(((S.xp - l.min) / (nx.min - l.min)) * 100)) : 100;
+      return { ...l, pct, nmin: nx?.min ?? l.min, left: nx ? Math.max(0, nx.min - S.xp) : 0 };
+    }
+  }
+  return { ...LEVELS[0], pct: 0, nmin: LEVELS[1].min, left: LEVELS[1].min };
+}
+
+function updateSidebar() {
+  const li = getLevelInfo();
+  document.getElementById('sb-lv').textContent = `Lv ${li.lv}`;
+  document.getElementById('sb-title').textContent = li.t;
+  document.getElementById('sb-bar').style.width = li.pct + '%';
+  document.getElementById('sb-xp').textContent = S.xp.toLocaleString();
+  document.getElementById('sb-pct').textContent = li.pct + '%';
+  document.getElementById('sb-next').textContent = li.nmin.toLocaleString();
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function getStats() {
+  const allTasks = MONTHS.flatMap(m => m.tasks);
+  const done = allTasks.filter(t => S.checked[t.id]).length;
+  const allProj = PROJECTS.flatMap(p => p.tasks.map((_, i) => `${p.id}-${i}`));
+  const projDone = allProj.filter(k => S.projDone[k]).length;
+  const totalH = S.hoursLog.reduce((s, e) => s + (e.l||0) + (e.p||0), 0);
+  const pct = Math.round((done / allTasks.length) * 100);
+  const focusMonth = MONTHS.find(m => m.tasks.some(t => !S.checked[t.id])) || MONTHS[5];
+  return { done, total: allTasks.length, pct, projDone, projTotal: allProj.length,
+    projPct: Math.round((projDone / allProj.length) * 100),
+    co: S.companies.length, totalH: Math.round(totalH * 10) / 10,
+    focusMonth };
+}
+
+function updateNavBadges() {
+  const st = getStats();
+  document.getElementById('nb-roadmap').textContent = st.pct + '%';
+  document.getElementById('nb-projects').textContent = st.projPct + '%';
+  const avgSkill = SKILLS.length ? Math.round(SKILLS.reduce((s,sk) => s + (S.skills[sk.id]||0), 0) / SKILLS.length) : 0;
+  document.getElementById('nb-skills').textContent = avgSkill + '%';
+  document.getElementById('nb-log').textContent = st.totalH + 'h';
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const st = getStats();
+  document.getElementById('ds-tasks').textContent = `${st.done}/${st.total}`;
+  document.getElementById('ds-tasks-sub').textContent = st.pct + '% complete';
+  document.getElementById('ds-proj').textContent = st.projPct + '%';
+  document.getElementById('ds-proj-sub').textContent = `${st.projDone}/${st.projTotal} complete`;
+  document.getElementById('ds-co').textContent = st.co;
+  document.getElementById('ds-hours').textContent = st.totalH + 'h';
+  document.getElementById('dash-pct').textContent = st.pct + '%';
+  document.getElementById('dash-xp').textContent = S.xp.toLocaleString();
+
+  const subs = ["Just getting started","Building momentum","Halfway there — don't stop","Solid progress, keep going","Almost there, final push!","Mission complete!"];
+  const si = Math.min(5, Math.floor(st.pct / 20));
+  document.getElementById('dash-pct-sub').textContent = subs[si];
+
+  // Month bars
+  const barsEl = document.getElementById('dash-month-bars');
+  barsEl.innerHTML = MONTHS.map(m => {
+    const d = m.tasks.filter(t => S.checked[t.id]).length;
+    const p = Math.round((d / m.tasks.length) * 100);
+    const col = p === 100 ? 'var(--green)' : d > 0 ? 'var(--amber)' : 'var(--dim)';
+    return `<div class="mbar-row">
+      <div class="mbar-lbl">${m.n}</div>
+      <div class="mbar-wrap"><div class="mbar-fill" style="width:${p}%;background:${col};"></div></div>
+      <div class="mbar-pct">${p}%</div>
+    </div>`;
+  }).join('');
+
+  // Focus month
+  const fm = st.focusMonth;
+  document.getElementById('dash-focus-lbl').textContent = `Current focus — Month ${fm.id}`;
+  document.getElementById('dash-month-title').textContent = fm.title;
+  document.getElementById('dash-month-sub').textContent = fm.sub;
+
+  const nextTasks = fm.tasks.filter(t => !S.checked[t.id]).slice(0, 4);
+  document.getElementById('dash-nextup').innerHTML = nextTasks.length
+    ? nextTasks.map(t => `<div class="next-task"><div class="next-arrow">→</div><div style="flex:1;">${t.t}</div></div>`).join('')
+    : `<div style="font-size:13px;color:var(--green);">All tasks in this month complete.</div>`;
+}
+
+// ============================================================
+// ROADMAP
+// ============================================================
+function renderRoadmap() {
+  const el = document.getElementById('roadmap-list');
+  el.innerHTML = MONTHS.map(m => {
+    const done = m.tasks.filter(t => S.checked[t.id]).length;
+    const pct = Math.round((done / m.tasks.length) * 100);
+    const isOpen = S.openMonth === m.id;
+    const isComplete = pct === 100;
+    const pctCol = isComplete ? 'var(--green)' : done > 0 ? 'var(--amber)' : 'var(--dim)';
+
+    const tasksHTML = m.tasks.map(t => {
+      const ck = S.checked[t.id];
+      const catCol = {core:'', extra:'color:var(--purple)', habit:'color:var(--blue)'}[t.cat] || '';
+      return `<div class="task-row${ck?' done':''}" data-chk="${t.id}">
+        <div class="task-check${ck?' on':''}">✓</div>
+        <div class="task-text" style="${catCol}">${t.t}</div>
+        <div class="task-xp">+10</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="month-block${isOpen?' open':''}${isComplete?' complete':''}">
+      <div class="month-header" data-exp="${m.id}">
+        <div class="month-num">${m.n}</div>
+        <div class="month-info">
+          <div class="month-title">${m.title}${isComplete?`<span class="done-chip">complete</span>`:''}</div>
+          <div class="month-sub">${m.sub}</div>
+        </div>
+        <div class="month-right">
+          <div class="month-pct" style="color:${pctCol};">${pct}%</div>
+          <div class="month-count">${done}/${m.tasks.length} tasks</div>
+        </div>
+        <div class="month-caret">${isOpen?'▲':'▼'}</div>
+      </div>
+      <div class="prog-wrap" style="margin:0;border-radius:0;"><div class="prog-fill" style="width:${pct}%;background:${isComplete?'var(--green)':'var(--amber)'};"></div></div>
+      <div class="month-body">
+        <div class="outcome-tag">Outcome: ${m.out}</div>
+        ${tasksHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  // bind
+  el.querySelectorAll('[data-chk]').forEach(row => {
+    row.onclick = () => {
+      const id = row.dataset.chk;
+      const was = S.checked[id];
+      S.checked[id] = !was;
+      if (!was) { S.xp += 10; toast('+10 XP — task checked off!'); }
+      else { S.xp = Math.max(0, S.xp - 10); }
+      updateAll(); saveState();
+    };
+  });
+
+  el.querySelectorAll('[data-exp]').forEach(hdr => {
+    hdr.onclick = () => {
+      const id = parseInt(hdr.dataset.exp);
+      S.openMonth = S.openMonth === id ? null : id;
+      renderRoadmap();
+    };
+  });
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+function renderProjects() {
+  const el = document.getElementById('projects-list');
+  el.innerHTML = PROJECTS.map(p => {
+    const done = p.tasks.filter((_, i) => S.projDone[`${p.id}-${i}`]).length;
+    const pct = Math.round((done / p.tasks.length) * 100);
+
+    const tasksHTML = p.tasks.map((task, i) => {
+      const key = `${p.id}-${i}`;
+      const ck = S.projDone[key];
+      return `<div class="task-row${ck?' done':''}" data-proj="${key}" style="padding:10px 0;">
+        <div class="task-check${ck?' on':''}" style="${ck?`background:${p.col};border-color:${p.col};color:#000;`:''}">✓</div>
+        <div class="task-text">${task}</div>
+        <div class="task-xp">+15</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="proj-card">
+      <div class="proj-top" style="border-left-color:${p.col};">
+        <div class="proj-type" style="color:${p.col};">${p.type} · ${p.span}</div>
+        <div class="proj-title">${p.title}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="prog-wrap" style="flex:1;margin:0;"><div class="prog-fill" style="width:${pct}%;background:${p.col};"></div></div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${p.col};flex-shrink:0;">${pct}%</div>
+        </div>
+      </div>
+      <div class="proj-tasks">${tasksHTML}</div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('[data-proj]').forEach(row => {
+    row.onclick = () => {
+      const k = row.dataset.proj;
+      const was = S.projDone[k];
+      S.projDone[k] = !was;
+      if (!was) { S.xp += 15; toast('+15 XP — project milestone!'); }
+      else { S.xp = Math.max(0, S.xp - 15); }
+      updateAll(); saveState();
+    };
+  });
+}
+
+// ============================================================
+// SKILLS
+// ============================================================
+function renderSkills() {
+  const groups = [
+    {id:'skills-p1', items: SKILLS.filter(s=>s.p===1)},
+    {id:'skills-p2', items: SKILLS.filter(s=>s.p===2)},
+    {id:'skills-p3', items: SKILLS.filter(s=>s.p===3)},
+    {id:'skills-extra', items: SKILLS.filter(s=>s.p===4)},
+  ];
+
+  groups.forEach(({id, items}) => {
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(sk => {
+      const v = S.skills[sk.id] || 0;
+      return `<div class="skill-row">
+        <div class="skill-name">${sk.l}</div>
+        <div class="skill-tag">${sk.t}</div>
+        <input type="range" min="0" max="100" step="5" value="${v}" data-skill="${sk.id}" style="accent-color:${sk.col};">
+        <div class="skill-pct" id="spct-${sk.id}" style="color:${sk.col};">${v}%</div>
+      </div>`;
+    }).join('');
+  });
+
+  document.querySelectorAll('[data-skill]').forEach(inp => {
+    inp.oninput = e => {
+      const id = inp.dataset.skill;
+      const nv = parseInt(e.target.value);
+      const ov = S.skills[id] || 0;
+      S.skills[id] = nv;
+      const lbl = document.getElementById('spct-' + id);
+      if (lbl) lbl.textContent = nv + '%';
+      if (nv > ov && nv % 25 === 0) {
+        S.xp += 20;
+        toast(`+20 XP — ${SKILLS.find(s=>s.id===id)?.l} at ${nv}%!`);
+        updateSidebar();
+      }
+      saveState(); updateNavBadges();
+    };
+  });
+}
+
+// ============================================================
+// LOG
+// ============================================================
+function renderLog() {
+  const st = getStats();
+
+  // Hours list
+  const hEl = document.getElementById('hours-log-list');
+  if (S.hoursLog.length === 0) {
+    hEl.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0;">No sessions logged yet.</div>`;
+  } else {
+    hEl.innerHTML = S.hoursLog.slice(0, 8).map(e => `<div class="log-entry">
+      <div class="log-top">
+        <div class="log-date">${e.date}</div>
+        <div class="log-hours"><span style="color:var(--blue);">${e.l}h learn</span> + <span style="color:var(--purple);">${e.p}h project</span> = <span style="color:var(--amber);">${Math.round((e.l+e.p)*10)/10}h</span></div>
+      </div>
+    </div>`).join('');
+  }
+
+  // Company bar
+  const cp = Math.min(100, Math.round((S.companies.length / 25) * 100));
+  document.getElementById('co-count').textContent = `${S.companies.length} / 25`;
+  document.getElementById('co-bar').style.width = cp + '%';
+
+  // Company list
+  const cEl = document.getElementById('co-list');
+  if (S.companies.length === 0) {
+    cEl.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0;">Start with Zerodha, Swiggy, or Zomato.</div>`;
+  } else {
+    cEl.innerHTML = S.companies.slice(0, 8).map(co => `<div class="log-entry">
+      <div class="log-top">
+        <div style="font-size:13px;font-weight:700;">${co.name}</div>
+        <div class="log-date">${co.date}</div>
+      </div>
+      ${co.insight ? `<div class="log-insight">${co.insight}</div>` : ''}
+    </div>`).join('');
+  }
+}
+
+// ============================================================
+// BIND LOG BUTTONS
+// ============================================================
+function bindLogButtons() {
+  document.getElementById('log-btn').onclick = () => {
+    const l = parseFloat(document.getElementById('log-l').value) || 0;
+    const p = parseFloat(document.getElementById('log-p').value) || 0;
+    if (!l && !p) { toast('Enter at least one value.'); return; }
+    const date = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+    S.hoursLog.unshift({date, l, p});
+    if (S.hoursLog.length > 30) S.hoursLog = S.hoursLog.slice(0, 30);
+    const bonus = Math.round((l + p) * 2);
+    S.xp += bonus;
+    toast(`+${bonus} XP — ${Math.round((l+p)*10)/10}h logged!`);
+    document.getElementById('log-l').value = '';
+    document.getElementById('log-p').value = '';
+    updateAll(); saveState(); renderLog();
+  };
+
+  document.getElementById('co-btn').onclick = () => {
+    const name = document.getElementById('co-name').value.trim();
+    if (!name) { toast('Enter a company name.'); return; }
+    const insight = document.getElementById('co-insight').value.trim();
+    const date = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+    S.companies.unshift({name, insight, date});
+    S.xp += 25;
+    toast(`+25 XP — ${name} analyzed!`);
+    document.getElementById('co-name').value = '';
+    document.getElementById('co-insight').value = '';
+    updateAll(); saveState(); renderLog();
+  };
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'roadmap') renderRoadmap();
+  if (tab === 'projects') renderProjects();
+  if (tab === 'skills') renderSkills();
+  if (tab === 'log') renderLog();
+}
+
+document.querySelectorAll('[data-tab]').forEach(item => {
+  item.onclick = () => switchTab(item.dataset.tab);
+});
+
+// ============================================================
+// UPDATE ALL
+// ============================================================
+function updateAll() {
+  updateSidebar();
+  updateNavBadges();
+  renderDashboard();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+updateAll();
+renderRoadmap();
+bindLogButtons();
+</script>
+</body>
+</html>
