@@ -3,1488 +3,714 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mission HQ — 6-Month Placement Protocol</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Mission HQ — Product · Analyst · Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0c;
-    --surface: #111114;
-    --surface2: #18181c;
-    --border: #2a2a30;
-    --border2: #3a3a42;
-    --text: #e8e8ec;
-    --muted: #7a7a88;
-    --dim: #4a4a58;
-    --amber: #f0a000;
-    --amber-dim: #f0a00022;
-    --amber-mid: #f0a00044;
-    --green: #00c97a;
-    --green-dim: #00c97a18;
-    --blue: #4a9eff;
-    --blue-dim: #4a9eff18;
-    --purple: #a78bfa;
-    --purple-dim: #a78bfa18;
-    --pink: #f472b6;
-    --red: #f87171;
-    --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
-    --radius: 10px;
-    --radius-lg: 16px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* === NOISE TEXTURE === */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0; opacity: .4;
-  }
-
-  /* === LAYOUT === */
-  .app { position: relative; z-index: 1; display: flex; height: 100vh; }
-
-  /* === SIDEBAR === */
-  .sidebar {
-    width: 220px;
-    flex-shrink: 0;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .sidebar-top {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--amber);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .logo-sub {
-    font-size: 10px;
-    color: var(--dim);
-    font-family: var(--mono);
-    letter-spacing: .06em;
-  }
-
-  /* XP section in sidebar */
-  .xp-section { padding: 18px 20px; border-bottom: 1px solid var(--border); }
-
-  .level-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--amber-dim);
-    border: 1px solid var(--amber-mid);
-    border-radius: 100px;
-    padding: 3px 10px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--amber);
-    margin-bottom: 8px;
-  }
-
-  .level-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
-
-  .level-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .xp-bar-wrap {
-    height: 3px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 8px 0 4px;
-  }
-
-  .xp-bar-fill {
-    height: 100%;
-    background: var(--amber);
-    border-radius: 2px;
-    transition: width .5s cubic-bezier(.4,0,.2,1);
-  }
-
-  .xp-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-  }
-
-  /* NAV */
-  nav { flex: 1; padding: 12px 0; overflow-y: auto; }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted);
-    border-left: 2px solid transparent;
-    transition: all .15s;
-    user-select: none;
-    letter-spacing: .01em;
-  }
-
-  .nav-item:hover { color: var(--text); background: var(--surface2); }
-
-  .nav-item.active {
-    color: var(--amber);
-    border-left-color: var(--amber);
-    background: var(--amber-dim);
-  }
-
-  .nav-icon {
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 10px;
-    opacity: .7;
-  }
-
-  .nav-badge {
-    margin-left: auto;
-    font-family: var(--mono);
-    font-size: 9px;
-    background: var(--surface2);
-    border-radius: 100px;
-    padding: 1px 6px;
-    color: var(--dim);
-  }
-
-  .nav-item.active .nav-badge {
-    background: var(--amber-mid);
-    color: var(--amber);
-  }
-
-  /* === MAIN === */
-  .main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px 32px;
-    min-width: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .main::-webkit-scrollbar { width: 4px; }
-  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; animation: fadeUp .2s ease; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* === PAGE HEADER === */
-  .page-header { margin-bottom: 28px; }
-  .page-title {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -.02em;
-    color: var(--text);
-    line-height: 1.1;
-    margin-bottom: 4px;
-  }
-  .page-title span { color: var(--amber); }
-  .page-sub { font-size: 13px; color: var(--muted); font-family: var(--mono); }
-
-  /* === CARDS === */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px 22px;
-    margin-bottom: 14px;
-  }
-
-  .card-sm {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-  }
-
-  .card-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--dim);
-    margin-bottom: 10px;
-  }
-
-  /* === STAT GRID === */
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color .2s;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    border-radius: 2px 2px 0 0;
-  }
-
-  .stat-card.amber::before { background: var(--amber); }
-  .stat-card.green::before { background: var(--green); }
-  .stat-card.blue::before { background: var(--blue); }
-  .stat-card.purple::before { background: var(--purple); }
-
-  .stat-val {
-    font-family: var(--mono);
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-card.amber .stat-val { color: var(--amber); }
-  .stat-card.green .stat-val { color: var(--green); }
-  .stat-card.blue .stat-val { color: var(--blue); }
-  .stat-card.purple .stat-val { color: var(--purple); }
-
-  .stat-lbl { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
-  .stat-sub { font-size: 10px; color: var(--dim); font-family: var(--mono); }
-
-  /* === PROGRESS BAR === */
-  .prog-wrap {
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 6px 0;
-  }
-
-  .prog-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width .5s cubic-bezier(.4,0,.2,1);
-  }
-
-  /* === MONTH ACCORDION === */
-  .month-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 10px;
-    transition: border-color .2s;
-  }
-
-  .month-block.open { border-color: var(--border2); }
-
-  .month-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    cursor: pointer;
-    user-select: none;
-    transition: background .15s;
-  }
-
-  .month-header:hover { background: var(--surface2); }
-
-  .month-num {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--border2);
-    width: 44px;
-    flex-shrink: 0;
-    line-height: 1;
-    transition: color .2s;
-  }
-
-  .month-block.open .month-num { color: var(--amber); }
-  .month-block.complete .month-num { color: var(--green); }
-
-  .month-info { flex: 1; min-width: 0; }
-
-  .month-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .done-chip {
-    font-family: var(--mono);
-    font-size: 9px;
-    background: var(--green-dim);
-    color: var(--green);
-    border: 1px solid #00c97a33;
-    border-radius: 100px;
-    padding: 2px 8px;
-    font-weight: 400;
-  }
-
-  .month-sub { font-size: 12px; color: var(--muted); }
-
-  .month-right {
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .month-pct {
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .month-count { font-size: 10px; color: var(--dim); font-family: var(--mono); }
-
-  .month-caret {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    margin-left: 8px;
-  }
-
-  .month-body {
-    display: none;
-    border-top: 1px solid var(--border);
-    padding: 6px 20px 14px;
-  }
-
-  .month-block.open .month-body { display: block; }
-
-  .outcome-tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--amber);
-    padding: 8px 0 10px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2px;
-  }
-
-  /* === TASKS === */
-  .task-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 0;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    transition: opacity .15s;
-  }
-
-  .task-row:last-child { border-bottom: none; }
-  .task-row.done { opacity: .35; }
-
-  .task-check {
-    width: 18px;
-    height: 18px;
-    border: 1.5px solid var(--border2);
-    border-radius: 4px;
-    flex-shrink: 0;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .15s;
-    font-family: var(--mono);
-    font-size: 11px;
-  }
-
-  .task-check.on {
-    background: var(--green);
-    border-color: var(--green);
-    color: #000;
-    font-weight: 700;
-  }
-
-  .task-text { flex: 1; font-size: 13px; line-height: 1.5; font-weight: 600; }
-  .task-row.done .task-text { text-decoration: line-through; color: var(--dim); }
-
-  .task-xp {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    flex-shrink: 0;
-    padding-top: 2px;
-  }
-
-  /* === PROJECTS === */
-  .proj-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 14px;
-  }
-
-  .proj-top {
-    padding: 20px 22px 16px;
-    border-left: 4px solid;
-  }
-
-  .proj-type { font-family: var(--mono); font-size: 10px; margin-bottom: 6px; opacity: .7; letter-spacing: .06em; text-transform: uppercase; }
-  .proj-title { font-size: 17px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.01em; }
-  .proj-tasks { padding: 0 22px 8px; border-top: 1px solid var(--border); }
-
-  /* === SKILLS === */
-  .skill-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .skill-row:last-child { border-bottom: none; }
-
-  .skill-name { font-size: 13px; font-weight: 700; flex: 1; min-width: 0; }
-  .skill-tag {
-    font-size: 10px;
-    color: var(--dim);
-    font-family: var(--mono);
-    white-space: nowrap;
-  }
-
-  .skill-pct {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    width: 36px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 110px;
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    outline: none;
-    flex-shrink: 0;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--amber);
-    cursor: pointer;
-    transition: transform .1s;
-  }
-
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-  input[type=range]::-moz-range-thumb {
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: var(--amber);
-    cursor: pointer;
-    border: none;
-  }
-
-  .skill-section-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    color: var(--dim);
-    padding: 16px 0 6px;
-  }
-
-  /* === LOG === */
-  .form-label { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; letter-spacing: .04em; }
-
-  input[type=text], input[type=number], textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 600;
-    outline: none;
-    transition: border-color .15s;
-    -moz-appearance: textfield;
-  }
-
-  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-  input[type=text]:focus, input[type=number]:focus, textarea:focus { border-color: var(--amber); }
-
-  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
-
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 11px 16px;
-    background: var(--amber);
-    border: none;
-    border-radius: var(--radius);
-    color: #0a0a0c;
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    letter-spacing: .02em;
-    transition: opacity .15s, transform .1s;
-    margin-top: 10px;
-  }
-
-  .btn:hover { opacity: .88; }
-  .btn:active { transform: scale(.98); }
-
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--muted);
-  }
-
-  .btn-ghost:hover { color: var(--text); background: var(--surface2); opacity: 1; }
-
-  .log-entry {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-
-  .log-entry:last-child { border-bottom: none; }
-
-  .log-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 2px;
-  }
-
-  .log-date { font-family: var(--mono); font-size: 10px; color: var(--dim); }
-  .log-hours { font-family: var(--mono); font-size: 11px; }
-  .log-insight { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-
-  /* === ALERT === */
-  .alert {
-    display: flex;
-    gap: 10px;
-    padding: 14px 16px;
-    border-radius: var(--radius);
-    font-size: 12px;
-    line-height: 1.5;
-    margin-bottom: 14px;
-  }
-
-  .alert-amber { background: var(--amber-dim); border: 1px solid var(--amber-mid); color: #f0a000cc; }
-  .alert-green { background: var(--green-dim); border: 1px solid #00c97a33; color: #00c97acc; }
-
-  .alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-  .alert-amber .alert-dot { background: var(--amber); }
-  .alert-green .alert-dot { background: var(--green); }
-
-  /* === TOAST === */
-  #toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 11px 16px;
-    font-size: 12px;
-    font-family: var(--mono);
-    color: var(--amber);
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity .2s, transform .2s;
-    max-width: 240px;
-    box-shadow: 0 4px 24px #00000060;
-  }
-
-  #toast.show { opacity: 1; transform: translateY(0); }
-
-  /* === GRID HELPERS === */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-  /* === DIVIDER === */
-  .div { height: 1px; background: var(--border); margin: 16px 0; }
-
-  /* === COMPANY TAG === */
-  .co-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-family: var(--mono);
-    color: var(--muted);
-    margin: 3px;
-    cursor: default;
-  }
-
-  /* === SCROLL BAR in sidebar === */
-  nav::-webkit-scrollbar { width: 2px; }
-  nav::-webkit-scrollbar-thumb { background: var(--border); }
-
-  /* === RESPONSIVE === */
-  @media (max-width: 640px) {
-    .sidebar { width: 56px; }
-    .sidebar .logo, .sidebar .logo-sub, .xp-section .level-title,
-    .xp-section .xp-label, .nav-item span, .nav-badge { display: none; }
-    .nav-item { padding: 12px; justify-content: center; }
-    .sidebar-top { padding: 16px 12px; }
-    .main { padding: 20px 16px; }
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    input[type=range] { width: 80px; }
-    .skill-tag { display: none; }
-  }
-
-  /* === WEEK RULE BAR === */
-  .rule-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-  .rule-row:last-child { border-bottom: none; }
-  .rule-icon { font-family: var(--mono); font-size: 11px; color: var(--amber); width: 18px; flex-shrink: 0; }
-
-  /* === PROGRESS RING (mini) === */
-  .overall-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 18px;
-  }
-
-  .big-pct {
-    font-family: var(--mono);
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--amber);
-    line-height: 1;
-    letter-spacing: -.04em;
-  }
-
-  .big-pct-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* month bars on dash */
-  .mbar-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 7px;
-    font-family: var(--mono);
-    font-size: 11px;
-  }
-  .mbar-lbl { color: var(--dim); width: 22px; flex-shrink: 0; }
-  .mbar-wrap { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .mbar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
-  .mbar-pct { color: var(--muted); width: 32px; text-align: right; flex-shrink: 0; }
-
-  /* next-up tasks */
-  .next-task {
-    display: flex;
-    gap: 9px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    align-items: flex-start;
-  }
-  .next-task:last-child { border-bottom: none; }
-  .next-arrow { color: var(--amber); font-family: var(--mono); font-size: 11px; flex-shrink: 0; padding-top: 2px; }
-
-  /* weekly habit dots */
-  .habit-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
-  .hday { width: 14px; height: 14px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; transition: background .15s; }
-  .hday.on { background: var(--green); border-color: var(--green); }
-  .hday.amber-on { background: var(--amber); border-color: var(--amber); }
+:root{
+  --bg:#08090a;--s1:#0f1012;--s2:#16171a;--s3:#1e1f23;
+  --b1:#2c2d32;--b2:#3a3b42;--b3:#4a4b54;
+  --t1:#f0f0f4;--t2:#a0a0b0;--t3:#606070;--t4:#3a3a48;
+  --amber:#e8960a;--amber-l:#f4aa20;
+  --amber-bg:#e8960a14;--amber-bd:#e8960a30;
+  --green:#00b874;--green-bg:#00b87414;--green-bd:#00b87430;
+  --blue:#3d8ef0;--blue-bg:#3d8ef014;--blue-bd:#3d8ef030;
+  --purple:#8b5cf6;--purple-bg:#8b5cf614;--purple-bd:#8b5cf630;
+  --pink:#e879a0;--pink-bg:#e879a014;--pink-bd:#e879a030;
+  --mono:'DM Mono',monospace;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px;line-height:1.5;overflow:hidden}
+.shell{display:flex;height:100vh}
+aside{width:230px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+main{flex:1;overflow-y:auto;min-width:0;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+main::-webkit-scrollbar{width:4px}
+main::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.main-inner{padding:32px 36px;max-width:900px}
+.sb-brand{padding:22px 20px 16px;border-bottom:1px solid var(--b1)}
+.sb-logo{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.14em;text-transform:uppercase}
+.sb-tagline{font-size:11px;color:var(--t3);margin-top:3px;font-family:var(--mono)}
+.xp-wrap{padding:16px 20px;border-bottom:1px solid var(--b1)}
+.lv-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lv-pill{font-family:var(--mono);font-size:10px;background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber);border-radius:100px;padding:2px 9px}
+.lv-name{font-size:12px;font-weight:600;color:var(--t1)}
+.xp-track{height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.xp-fill{height:100%;background:var(--amber);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.xp-nums{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px}
+.xp-nums span:nth-child(2){color:var(--amber)}
+nav{flex:1;padding:10px 0;overflow-y:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;color:var(--t3);font-size:13px;font-weight:500;border-left:2px solid transparent;transition:all .12s;user-select:none}
+.ni:hover{color:var(--t1);background:var(--s2)}
+.ni.on{color:var(--amber);border-left-color:var(--amber);background:var(--amber-bg)}
+.ni-ic{font-family:var(--mono);font-size:10px;width:16px;text-align:center;opacity:.6}
+.ni-badge{margin-left:auto;font-family:var(--mono);font-size:9px;background:var(--s3);border-radius:100px;padding:1px 7px;color:var(--t4)}
+.ni.on .ni-badge{background:var(--amber-bg);color:var(--amber)}
+.ni-sep{height:1px;background:var(--b1);margin:8px 0}
+.ni-sec{font-family:var(--mono);font-size:9px;color:var(--t4);padding:10px 20px 4px;text-transform:uppercase;letter-spacing:.12em}
+.ph{margin-bottom:28px}
+.ph-title{font-family:var(--serif);font-size:32px;line-height:1;margin-bottom:5px;letter-spacing:-.01em}
+.ph-title em{color:var(--amber);font-style:italic}
+.ph-sub{font-family:var(--mono);font-size:11px;color:var(--t3)}
+.tab{display:none}
+.tab.on{display:block;animation:fu .2s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.sc.a::after{background:var(--amber)}.sc.g::after{background:var(--green)}
+.sc.b::after{background:var(--blue)}.sc.p::after{background:var(--purple)}.sc.pk::after{background:var(--pink)}
+.sc-v{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
+.sc.a .sc-v{color:var(--amber)}.sc.g .sc-v{color:var(--green)}.sc.b .sc-v{color:var(--blue)}.sc.p .sc-v{color:var(--purple)}.sc.pk .sc-v{color:var(--pink)}
+.sc-l{font-size:11px;color:var(--t2);margin-bottom:1px}.sc-s{font-family:var(--mono);font-size:10px;color:var(--t4)}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 22px;margin-bottom:14px}
+.card-sm{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:8px}
+.cl{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--t4);margin-bottom:10px}
+.pb{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin:5px 0}
+.pf{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.tp{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;border-radius:100px;padding:2px 8px;border:1px solid;margin-right:4px;margin-bottom:2px}
+.tp-product{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue)}
+.tp-analyst{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber)}
+.tp-strategy{background:var(--purple-bg);border-color:var(--purple-bd);color:var(--purple)}
+.tp-extra{background:var(--pink-bg);border-color:var(--pink-bd);color:var(--pink)}
+.tp-habit{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.mb{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:10px;transition:border-color .2s}
+.mb.open{border-color:var(--b2)}
+.mb-hdr{display:flex;align-items:center;gap:14px;padding:15px 20px;cursor:pointer;user-select:none;transition:background .12s}
+.mb-hdr:hover{background:var(--s2)}
+.mb-num{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--b3);width:42px;flex-shrink:0;line-height:1;transition:color .2s}
+.mb.open .mb-num{color:var(--amber)}.mb.done-m .mb-num{color:var(--green)}
+.mb-info{flex:1;min-width:0}
+.mb-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:2px}
+.mb-sub{font-size:11px;color:var(--t3)}
+.mb-right{text-align:right;flex-shrink:0}
+.mb-pct{font-family:var(--mono);font-size:15px;font-weight:700}
+.mb-cnt{font-family:var(--mono);font-size:10px;color:var(--t4)}
+.done-chip{font-family:var(--mono);font-size:9px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);border-radius:100px;padding:2px 8px}
+.mb-body{display:none;border-top:1px solid var(--b1);padding:4px 20px 14px}
+.mb.open .mb-body{display:block}
+.mb-out{font-family:var(--mono);font-size:10px;color:var(--amber);padding:10px 0 8px;border-bottom:1px solid var(--b1);margin-bottom:2px}
+.tr{display:flex;align-items:flex-start;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid var(--b1);transition:opacity .12s}
+.tr:last-child{border-bottom:none}
+.tr.done{opacity:.3}
+.tr-ck{width:17px;height:17px;border:1.5px solid var(--b2);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;transition:all .12s}
+.tr-ck.on{background:var(--green);border-color:var(--green);color:#000}
+.tr-txt{flex:1;font-size:13px;line-height:1.5;font-weight:500}
+.tr.done .tr-txt{text-decoration:line-through;color:var(--t4)}
+.tr-xp{font-family:var(--mono);font-size:9px;color:var(--t4);flex-shrink:0;padding-top:2px}
+.pj{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
+.pj-top{padding:18px 22px 14px;border-left:3px solid}
+.pj-type{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:5px}
+.pj-title{font-family:var(--serif);font-size:20px;margin-bottom:4px}
+.pj-span{font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:10px}
+.pj-tasks{padding:0 22px 8px;border-top:1px solid var(--b1)}
+.pj-out{font-family:var(--mono);font-size:10px;color:var(--t3);padding:8px 22px;background:var(--s2)}
+.sk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1)}
+.sk-row:last-child{border-bottom:none}
+.sk-name{font-size:13px;font-weight:600;flex:1}
+.sk-tag{font-family:var(--mono);font-size:9px;color:var(--t4);white-space:nowrap}
+.sk-pct{font-family:var(--mono);font-size:11px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+input[type=range]{-webkit-appearance:none;width:100px;height:3px;background:var(--s3);border-radius:2px;outline:none;flex-shrink:0;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;cursor:pointer;transition:transform .1s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;cursor:pointer;border:none}
+.sk-sec{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--t4);padding:14px 0 6px}
+.fl{font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:5px;letter-spacing:.04em}
+input[type=text],input[type=number],textarea,select{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--t1);font-family:var(--sans);font-size:13px;font-weight:500;outline:none;transition:border-color .12s;-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{border-color:var(--amber)}
+textarea{resize:vertical;min-height:76px;line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--amber);border:none;border-radius:var(--r);color:#000;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .12s,transform .1s;margin-top:10px}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.98)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.gap{margin-bottom:10px}
+.le{padding:9px 0;border-bottom:1px solid var(--b1);font-size:12px}
+.le:last-child{border-bottom:none}
+.le-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px;margin-bottom:2px}
+.le-name{font-size:13px;font-weight:700}
+.le-date{font-family:var(--mono);font-size:9px;color:var(--t4)}
+.le-note{font-size:12px;color:var(--t3);line-height:1.4;margin-top:2px}
+.alert{display:flex;gap:10px;padding:13px 16px;border-radius:var(--r);font-size:12px;line-height:1.6;margin-bottom:14px}
+.alert-a{background:var(--amber-bg);border:1px solid var(--amber-bd);color:#e8960acc}
+.alert-b{background:var(--blue-bg);border:1px solid var(--blue-bd);color:#3d8ef0cc}
+.alert-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-a .alert-dot{background:var(--amber)}.alert-b .alert-dot{background:var(--blue)}
+.mbr{display:flex;align-items:center;gap:9px;margin-bottom:6px;font-family:var(--mono);font-size:10px}
+.mbr-l{color:var(--t4);width:20px;flex-shrink:0}
+.mbr-w{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.mbr-f{height:100%;border-radius:2px;transition:width .5s}
+.mbr-p{color:var(--t3);width:30px;text-align:right;flex-shrink:0}
+.nt{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1);font-size:13px}
+.nt:last-child{border-bottom:none}
+.nt-a{font-family:var(--mono);font-size:10px;color:var(--amber);flex-shrink:0;padding-top:2px}
+.bigpct{font-family:var(--mono);font-size:44px;font-weight:700;color:var(--amber);line-height:1;letter-spacing:-.04em}
+.bigpct-sub{font-size:11px;color:var(--t3);margin-top:3px;font-family:var(--mono)}
+.co-tgt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.co-chip{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 12px;font-size:12px;font-weight:600}
+.co-chip span{font-family:var(--mono);font-size:9px;display:block;color:var(--t3);margin-top:2px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ld{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--t3)}
+.ld-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.iq{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.iq-q{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.4}
+.iq-h{font-size:11px;color:var(--t3)}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--amber);z-index:9999;pointer-events:none;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;max-width:260px;box-shadow:0 8px 32px #00000060}
+#toast.on{opacity:1;transform:translateY(0)}
+@media(max-width:700px){
+  aside{width:52px}
+  .sb-brand,.sb-tagline,.xp-wrap,.ni-sec,.ni span:not(.ni-ic),.ni-badge{display:none}
+  .ni{padding:12px 0;justify-content:center}
+  .main-inner{padding:20px 16px}
+  .g2,.g3{grid-template-columns:1fr}
+  input[type=range]{width:70px}.sk-tag{display:none}
+}
 </style>
 </head>
 <body>
+<div class="shell">
+<aside>
+  <div class="sb-brand">
+    <div class="sb-logo">Mission HQ</div>
+    <div class="sb-tagline">Product · Analyst · Strategy</div>
+  </div>
+  <div class="xp-wrap">
+    <div class="lv-row"><div class="lv-pill" id="sb-lv">Lv 1</div><div class="lv-name" id="sb-name">Curious beginner</div></div>
+    <div class="xp-track"><div class="xp-fill" id="sb-bar" style="width:0%"></div></div>
+    <div class="xp-nums"><span id="sb-xp">0 XP</span><span id="sb-pct">0%</span><span id="sb-max">300</span></div>
+  </div>
+  <nav>
+    <div class="ni-sec">Overview</div>
+    <div class="ni on" data-tab="dash"><span class="ni-ic">⊞</span><span>Dashboard</span></div>
+    <div class="ni-sec">Execution</div>
+    <div class="ni" data-tab="roadmap"><span class="ni-ic">◈</span><span>Roadmap</span><span class="ni-badge" id="nb-road">0%</span></div>
+    <div class="ni" data-tab="projects"><span class="ni-ic">◉</span><span>Projects</span><span class="ni-badge" id="nb-proj">0%</span></div>
+    <div class="ni-sec">Mastery</div>
+    <div class="ni" data-tab="skills"><span class="ni-ic">◎</span><span>Skills</span><span class="ni-badge" id="nb-skill">0%</span></div>
+    <div class="ni" data-tab="interviews"><span class="ni-ic">◷</span><span>Interviews</span><span class="ni-badge" id="nb-iv">0/30</span></div>
+    <div class="ni-sec">Tracking</div>
+    <div class="ni" data-tab="log"><span class="ni-ic">≡</span><span>Log</span><span class="ni-badge" id="nb-log">0h</span></div>
+  </nav>
+</aside>
+<main>
+<div class="main-inner">
 
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="logo">Mission HQ</div>
-      <div class="logo-sub">6-month protocol</div>
+<!-- DASHBOARD -->
+<div class="tab on" id="tab-dash">
+  <div class="ph"><div class="ph-title">Mission <em>Control</em></div><div class="ph-sub">6 months · Product · Analyst · Strategy · Indian Startups + Big Tech</div></div>
+  <div class="sg" id="d-stats"></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;">
+      <div><div class="cl">Overall completion</div><div class="bigpct" id="d-pct">0%</div><div class="bigpct-sub" id="d-sub">Just getting started</div></div>
+      <div style="text-align:right;padding-bottom:4px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t4);margin-bottom:3px;">Total XP</div><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);" id="d-xp">0</div></div>
     </div>
-
-    <div class="xp-section" id="xp-section">
-      <div class="level-badge"><div class="level-dot"></div><span id="sb-lv">Lv 1</span></div>
-      <div class="level-title" id="sb-title">Curious beginner</div>
-      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="sb-bar" style="width:0%"></div></div>
-      <div class="xp-label"><span id="sb-xp">0</span><span id="sb-pct">0%</span><span id="sb-next">300</span></div>
+    <div id="d-bars"></div>
+  </div>
+  <div class="card">
+    <div class="cl" id="d-focus-lbl">Current focus — Month 1</div>
+    <div style="font-family:var(--serif);font-size:20px;margin-bottom:2px;" id="d-m-title">Foundation</div>
+    <div style="font-size:12px;color:var(--t3);margin-bottom:14px;" id="d-m-sub"></div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Next up</div>
+    <div id="d-nextup"></div>
+  </div>
+  <div class="card">
+    <div class="cl">Target companies — your hit list</div>
+    <div class="co-tgt">
+      <div class="co-chip">Razorpay<span>Fintech · PM / Analyst</span></div>
+      <div class="co-chip">Meesho<span>E-commerce · PM / Growth</span></div>
+      <div class="co-chip">Zerodha<span>Fintech · Analyst / Strategy</span></div>
+      <div class="co-chip">Google<span>Big Tech · APM Program</span></div>
+      <div class="co-chip">Microsoft<span>Big Tech · PM / Analyst</span></div>
+      <div class="co-chip">Meta<span>Big Tech · APM / Data</span></div>
+      <div class="co-chip">Groww<span>Fintech · PM / Growth</span></div>
+      <div class="co-chip">PhonePe<span>Payments · PM / Analyst</span></div>
+      <div class="co-chip">Mamaearth<span>D2C · Strategy / Growth</span></div>
+      <div class="co-chip">Sugar Cosmetics<span>D2C · Brand Strategy</span></div>
     </div>
-
-    <nav>
-      <div class="nav-item active" data-tab="dashboard">
-        <span class="nav-icon">⊞</span>
-        <span>Dashboard</span>
-      </div>
-      <div class="nav-item" data-tab="roadmap">
-        <span class="nav-icon">◈</span>
-        <span>Roadmap</span>
-        <span class="nav-badge" id="nb-roadmap">0%</span>
-      </div>
-      <div class="nav-item" data-tab="projects">
-        <span class="nav-icon">◉</span>
-        <span>Projects</span>
-        <span class="nav-badge" id="nb-projects">0%</span>
-      </div>
-      <div class="nav-item" data-tab="skills">
-        <span class="nav-icon">◎</span>
-        <span>Skills</span>
-        <span class="nav-badge" id="nb-skills">0%</span>
-      </div>
-      <div class="nav-item" data-tab="log">
-        <span class="nav-icon">◷</span>
-        <span>Log</span>
-        <span class="nav-badge" id="nb-log">0h</span>
-      </div>
-    </nav>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- ===== DASHBOARD ===== -->
-    <div class="tab-content active" id="tab-dashboard">
-      <div class="page-header">
-        <div class="page-title">Mission <span>Control</span></div>
-        <div class="page-sub">Your 6-month placement command center</div>
-      </div>
-
-      <div class="stat-grid" id="dash-stats">
-        <div class="stat-card amber">
-          <div class="stat-val" id="ds-tasks">0/48</div>
-          <div class="stat-lbl">Tasks done</div>
-          <div class="stat-sub" id="ds-tasks-sub">0% complete</div>
-        </div>
-        <div class="stat-card purple">
-          <div class="stat-val" id="ds-proj">0%</div>
-          <div class="stat-lbl">Project milestones</div>
-          <div class="stat-sub" id="ds-proj-sub">0/22 complete</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-val" id="ds-co">0</div>
-          <div class="stat-lbl">Companies analyzed</div>
-          <div class="stat-sub">Target: 25 over 6 months</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-val" id="ds-hours">0h</div>
-          <div class="stat-lbl">Hours logged</div>
-          <div class="stat-sub">Target: 15+ per week</div>
-        </div>
-      </div>
-
-      <!-- overall + month bars -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;">
-          <div>
-            <div class="card-label">Overall progress</div>
-            <div class="big-pct" id="dash-pct">0%</div>
-            <div class="big-pct-sub" id="dash-pct-sub">Just getting started</div>
-          </div>
-          <div style="text-align:right;padding-bottom:4px;">
-            <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:4px;">XP earned</div>
-            <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);" id="dash-xp">0</div>
-          </div>
-        </div>
-        <div id="dash-month-bars"></div>
-      </div>
-
-      <!-- next up -->
-      <div class="card">
-        <div class="card-label" id="dash-focus-lbl">Current focus — Month 1</div>
-        <div style="font-size:16px;font-weight:800;margin-bottom:2px;" id="dash-month-title">Foundation</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;" id="dash-month-sub">Excel mastery & SQL basics</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Next up</div>
-        <div id="dash-nextup"></div>
-      </div>
-
-      <!-- weekly rules -->
-      <div class="card">
-        <div class="card-label">Weekly non-negotiables</div>
-        <div class="rule-row"><div class="rule-icon">→</div><div>15 focused hours minimum <span style="font-family:var(--mono);font-size:10px;color:var(--dim);">(8 learning + 7 project)</span></div></div>
-        <div class="rule-row"><div class="rule-icon">→</div><div>1 company analyzed deeply every week</div></div>
-        <div class="rule-row"><div class="rule-icon">→</div><div>roadmap.sh progress, at least one section</div></div>
-        <div class="rule-row"><div class="rule-icon">→</div><div>No new courses until current ones are done</div></div>
-      </div>
-
-      <div class="alert alert-amber">
-        <div class="alert-dot"></div>
-        <div><strong>Depth beats activity.</strong> Your biggest enemy is distraction — new courses, random internships, unnecessary certifications. If you keep switching, you finish 6 months with half-built skills and weak projects.</div>
-      </div>
-    </div>
-
-    <!-- ===== ROADMAP ===== -->
-    <div class="tab-content" id="tab-roadmap">
-      <div class="page-header">
-        <div class="page-title">6-Month <span>Roadmap</span></div>
-        <div class="page-sub">Click a month to expand — check tasks to earn XP</div>
-      </div>
-      <div id="roadmap-list"></div>
-    </div>
-
-    <!-- ===== PROJECTS ===== -->
-    <div class="tab-content" id="tab-projects">
-      <div class="page-header">
-        <div class="page-title">Portfolio <span>Projects</span></div>
-        <div class="page-sub">4 serious projects that demonstrate real capability</div>
-      </div>
-      <div id="projects-list"></div>
-    </div>
-
-    <!-- ===== SKILLS ===== -->
-    <div class="tab-content" id="tab-skills">
-      <div class="page-header">
-        <div class="page-title">Skill <span>Tracker</span></div>
-        <div class="page-sub">Rate yourself honestly — earn 20 XP at every 25% milestone</div>
-      </div>
-
-      <div class="card">
-        <div class="skill-section-label">Priority 1 — Non-negotiable (core placement skills)</div>
-        <div id="skills-p1"></div>
-        <div class="skill-section-label">Priority 2 — Differentiators</div>
-        <div id="skills-p2"></div>
-        <div class="skill-section-label">Priority 3 — Nice to have</div>
-        <div id="skills-p3"></div>
-        <div class="skill-section-label">Extra — Your unique edge</div>
-        <div id="skills-extra"></div>
-      </div>
-    </div>
-
-    <!-- ===== LOG ===== -->
-    <div class="tab-content" id="tab-log">
-      <div class="page-header">
-        <div class="page-title">Daily <span>Log</span></div>
-        <div class="page-sub">Track hours and companies analyzed — accountability builds discipline</div>
-      </div>
-
-      <div class="grid-2" style="align-items:start;">
-        <!-- Hours card -->
-        <div class="card">
-          <div class="card-label">Log today's hours</div>
-          <div class="grid-2">
-            <div>
-              <div class="form-label">Learning (hrs)</div>
-              <input type="number" id="log-l" min="0" max="16" step="0.5" placeholder="0">
-            </div>
-            <div>
-              <div class="form-label">Project work (hrs)</div>
-              <input type="number" id="log-p" min="0" max="16" step="0.5" placeholder="0">
-            </div>
-          </div>
-          <button class="btn" id="log-btn">Log hours → +XP</button>
-          <div class="div"></div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">Recent sessions</div>
-          <div id="hours-log-list"></div>
-        </div>
-
-        <!-- Company card -->
-        <div class="card">
-          <div class="card-label">Company analysis</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Analyze 1 company/week. Ask: how does it make money? Growth strategy? Weakness? What would you change?</div>
-          <div class="form-label">Company name</div>
-          <input type="text" id="co-name" placeholder="e.g. Zerodha, Swiggy, Notion...">
-          <div class="form-label" style="margin-top:10px;">Key insight</div>
-          <textarea id="co-insight" placeholder="Revenue model, growth strategy, weakness you spotted..."></textarea>
-          <button class="btn" id="co-btn">Add analysis → +25 XP</button>
-          <div class="div"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <div style="font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;">Companies analyzed</div>
-            <div style="font-family:var(--mono);font-size:11px;color:var(--amber);" id="co-count">0 / 25</div>
-          </div>
-          <div class="prog-wrap"><div class="prog-fill" id="co-bar" style="width:0%;background:var(--amber);"></div></div>
-          <div id="co-list" style="margin-top:12px;"></div>
-        </div>
-      </div>
-    </div>
-
-  </main>
+  </div>
+  <div class="alert alert-a"><div class="alert-dot"></div><div><strong>Your positioning:</strong> Analyst skills as your proof. Product thinking as your pitch. Strategy as your edge. This combo opens PM, Analyst, and Strategy roles simultaneously at startups and Big Tech.</div></div>
 </div>
 
-<div id="toast"></div>
+<!-- ROADMAP -->
+<div class="tab" id="tab-roadmap">
+  <div class="ph"><div class="ph-title">6-Month <em>Roadmap</em></div><div class="ph-sub">Click to expand · Check tasks to earn XP</div></div>
+  <div class="legend">
+    <div class="ld"><div class="ld-dot" style="background:var(--blue)"></div>Product</div>
+    <div class="ld"><div class="ld-dot" style="background:var(--amber)"></div>Analyst</div>
+    <div class="ld"><div class="ld-dot" style="background:var(--purple)"></div>Strategy</div>
+    <div class="ld"><div class="ld-dot" style="background:var(--pink)"></div>Extra (AI/ML, LeetCode, Stats)</div>
+    <div class="ld"><div class="ld-dot" style="background:var(--green)"></div>Habit</div>
+  </div>
+  <div id="road-list"></div>
+</div>
 
+<!-- PROJECTS -->
+<div class="tab" id="tab-projects">
+  <div class="ph"><div class="ph-title">Portfolio <em>Projects</em></div><div class="ph-sub">4 projects across all three tracks — this is what gets you interviews</div></div>
+  <div id="proj-list"></div>
+</div>
+
+<!-- SKILLS -->
+<div class="tab" id="tab-skills">
+  <div class="ph"><div class="ph-title">Skill <em>Tracker</em></div><div class="ph-sub">Rate yourself honestly · +20 XP at every 25% milestone</div></div>
+  <div class="card"><div id="sk-p1"></div><div id="sk-p2"></div><div id="sk-p3"></div><div id="sk-ex"></div></div>
+</div>
+
+<!-- INTERVIEWS -->
+<div class="tab" id="tab-interviews">
+  <div class="ph"><div class="ph-title">Interview <em>Prep</em></div><div class="ph-sub">Track mock interviews · Real questions from your target companies</div></div>
+  <div class="card">
+    <div class="cl">Mock interview tracker — target: 30 before placement</div>
+    <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;"><span id="iv-lbl">0 / 30 mocks completed</span><span id="iv-pct">0%</span></div>
+    <div class="pb"><div class="pf" id="iv-bar" style="width:0%;background:var(--blue)"></div></div>
+    <div class="g3" style="margin-top:14px;">
+      <div class="card-sm"><div class="cl">Product design</div><div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--blue);" id="iv-pm">0</div><button class="btn" style="background:var(--blue);font-size:11px;padding:6px;margin-top:8px;" onclick="logIV('pm')">+1 mock</button></div>
+      <div class="card-sm"><div class="cl">Analytics / case</div><div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);" id="iv-an">0</div><button class="btn" style="background:var(--amber);font-size:11px;padding:6px;margin-top:8px;" onclick="logIV('an')">+1 mock</button></div>
+      <div class="card-sm"><div class="cl">Guesstimate</div><div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--purple);" id="iv-gs">0</div><button class="btn" style="background:var(--purple);font-size:11px;padding:6px;margin-top:8px;" onclick="logIV('gs')">+1 mock</button></div>
+    </div>
+  </div>
+  <div class="card"><div class="cl">Product design questions — Google, Meta, Razorpay, Meesho</div><div id="qs-pm"></div></div>
+  <div class="card"><div class="cl">Analytics & metrics questions — all PM + analyst roles</div><div id="qs-an"></div></div>
+  <div class="card"><div class="cl">Strategy & business case — consulting + founder's office</div><div id="qs-st"></div></div>
+  <div class="card"><div class="cl">Guesstimate — universal screening round</div><div id="qs-gs"></div></div>
+</div>
+
+<!-- LOG -->
+<div class="tab" id="tab-log">
+  <div class="ph"><div class="ph-title">Daily <em>Log</em></div><div class="ph-sub">Hours + company analysis — the two habits that separate top candidates</div></div>
+  <div class="g2" style="align-items:start;">
+    <div>
+      <div class="card">
+        <div class="cl">Log today's hours</div>
+        <div class="g2">
+          <div><div class="fl">Learning (hrs)</div><input type="number" id="log-l" min="0" max="16" step="0.5" placeholder="0"></div>
+          <div><div class="fl">Project work (hrs)</div><input type="number" id="log-p" min="0" max="16" step="0.5" placeholder="0"></div>
+        </div>
+        <button class="btn" id="log-btn">Log hours → +XP</button>
+      </div>
+      <div class="card"><div class="cl">Recent sessions · <span id="tot-h" style="color:var(--amber)">0h total</span></div><div id="h-log"></div></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="cl">Company analysis</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px;line-height:1.6;">1 per week. Ask: How does it make money? What's its growth strategy? Where are its weaknesses? What would you change about its product?</div>
+        <div class="fl">Company name</div>
+        <input type="text" id="co-n" placeholder="e.g. Zerodha, Razorpay, Meesho..." class="gap">
+        <div class="fl">Lens</div>
+        <select id="co-role" class="gap"><option value="product">Product lens</option><option value="analyst">Analyst lens</option><option value="strategy">Strategy lens</option></select>
+        <div class="fl">Key insight</div>
+        <textarea id="co-i" placeholder="Revenue model, growth strategy, product weakness, what you'd change..."></textarea>
+        <button class="btn" id="co-btn">Add analysis → +25 XP</button>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;"><span>Companies analyzed</span><span id="co-cnt">0 / 25</span></div>
+        <div class="pb"><div class="pf" id="co-bar" style="width:0%;background:var(--amber)"></div></div>
+        <div id="co-log" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</main>
+</div>
+<div id="toast"></div>
 <script>
-// ============================================================
-// DATA
-// ============================================================
-const MONTHS = [
-  {id:1,n:"01",title:"Foundation",sub:"Excel mastery & SQL basics",out:"Dataset exploration complete",tasks:[
-    {id:"1-1",t:"Master Excel: pivots, VLOOKUP, INDEX/MATCH, dynamic charts",cat:"core"},
-    {id:"1-2",t:"SQL basics: SELECT, WHERE, JOINs, GROUP BY, HAVING",cat:"core"},
-    {id:"1-3",t:"Download and explore a Kaggle retail/e-commerce dataset",cat:"core"},
-    {id:"1-4",t:"roadmap.sh: start the data analyst learning path",cat:"core"},
-    {id:"1-5",t:"Stats & maths: descriptive stats — mean, median, std dev, percentiles",cat:"extra"},
-    {id:"1-6",t:"AI/ML core: Python refresh, NumPy and Pandas fundamentals",cat:"extra"},
-    {id:"1-7",t:"LeetCode: arrays & strings — 5 easy problems",cat:"extra"},
-    {id:"1-8",t:"Company analysis: analyze 4 companies this month (1 per week)",cat:"habit"},
+const MONTHS=[
+  {id:1,n:"01",title:"Foundation",sub:"Excel + SQL + PM basics + first user interview",out:"Dataset explored · First user interview conducted",tasks:[
+    {id:"1-1",t:"Master Excel: pivots, VLOOKUP, INDEX/MATCH, dynamic dashboards",c:"analyst"},
+    {id:"1-2",t:"SQL basics: SELECT, WHERE, JOINs, GROUP BY, HAVING",c:"analyst"},
+    {id:"1-3",t:"PM fundamentals: what PMs do, APM programs, product lifecycle",c:"product"},
+    {id:"1-4",t:"Conduct 3 user interviews — pick any app, practice the skill",c:"product"},
+    {id:"1-5",t:"roadmap.sh: start data analyst + product manager learning paths",c:"analyst"},
+    {id:"1-6",t:"Stats: descriptive stats — mean, median, std dev, distributions",c:"extra"},
+    {id:"1-7",t:"AI/ML: Python refresh, NumPy, Pandas — data wrangling",c:"extra"},
+    {id:"1-8",t:"LeetCode: arrays & strings — 5 easy problems",c:"extra"},
+    {id:"1-9",t:"Company analysis: 4 companies this month (1 per week)",c:"habit"},
   ]},
-  {id:2,n:"02",title:"Data fluency",sub:"SQL queries & dashboard building",out:"Project 1 — E-commerce analysis complete",tasks:[
-    {id:"2-1",t:"Advanced SQL: subqueries, window functions, CTEs",cat:"core"},
-    {id:"2-2",t:"Build Excel dashboard with 4+ KPI cards and charts",cat:"core"},
-    {id:"2-3",t:"Write 5–8 business insights in report format",cat:"core"},
-    {id:"2-4",t:"roadmap.sh: SQL deep-dive section complete",cat:"core"},
-    {id:"2-5",t:"Stats: probability, Bayes theorem, distributions",cat:"extra"},
-    {id:"2-6",t:"AI/ML: linear & logistic regression from scratch in Python",cat:"extra"},
-    {id:"2-7",t:"LeetCode: hashing & two pointers — 10 problems",cat:"extra"},
-    {id:"2-8",t:"Company analysis: 4 companies this month",cat:"habit"},
+  {id:2,n:"02",title:"Data fluency",sub:"SQL mastery + dashboards + PM frameworks + first PRD",out:"Project 1 complete · First PRD written",tasks:[
+    {id:"2-1",t:"Advanced SQL: window functions, CTEs, subqueries",c:"analyst"},
+    {id:"2-2",t:"Build Excel/Power BI dashboard with 4+ KPIs and charts",c:"analyst"},
+    {id:"2-3",t:"Write 5–8 business insights from data in report format",c:"analyst"},
+    {id:"2-4",t:"CIRCLES framework, jobs-to-be-done, north star metric",c:"product"},
+    {id:"2-5",t:"Write your first 1-page PRD for a simple feature (any app)",c:"product"},
+    {id:"2-6",t:"roadmap.sh: SQL deep-dive + product thinking sections",c:"analyst"},
+    {id:"2-7",t:"Stats: probability, Bayes theorem, distributions",c:"extra"},
+    {id:"2-8",t:"AI/ML: linear & logistic regression — implement from scratch",c:"extra"},
+    {id:"2-9",t:"LeetCode: hashing & two pointers — 10 problems",c:"extra"},
   ]},
-  {id:3,n:"03",title:"Strategy layer",sub:"Market research methods",out:"Project 2 — Market research report complete",tasks:[
-    {id:"3-1",t:"Market sizing frameworks: TAM, SAM, SOM — with practice problems",cat:"core"},
-    {id:"3-2",t:"Competitive analysis: Porter's 5 Forces, SWOT, Blue Ocean",cat:"core"},
-    {id:"3-3",t:"Write 10–12 page AI skincare industry report",cat:"core"},
-    {id:"3-4",t:"roadmap.sh: business intelligence tools section",cat:"core"},
-    {id:"3-5",t:"Stats: regression analysis, correlation, R², residuals",cat:"extra"},
-    {id:"3-6",t:"AI/ML: decision trees, random forests, XGBoost — implement + tune",cat:"extra"},
-    {id:"3-7",t:"AI Agents: ReAct loop, tool-calling, function calling",cat:"extra"},
-    {id:"3-8",t:"LeetCode: sliding window & binary search — 10 problems",cat:"extra"},
+  {id:3,n:"03",title:"Strategy layer",sub:"Market research + product teardown + Figma intro",out:"Project 2 + 3 complete",tasks:[
+    {id:"3-1",t:"Market sizing: TAM/SAM/SOM — 3 practice problems on Indian markets",c:"strategy"},
+    {id:"3-2",t:"Competitive analysis: Porter's 5 Forces, SWOT, positioning maps",c:"strategy"},
+    {id:"3-3",t:"Write 10–12 page market research report (AI, D2C, or fintech)",c:"strategy"},
+    {id:"3-4",t:"Complete 12–15 slide product teardown deck (Zerodha/Meesho/Razorpay)",c:"product"},
+    {id:"3-5",t:"Figma: build a 3-screen wireframe for a feature",c:"product"},
+    {id:"3-6",t:"Stats: regression, correlation, R²",c:"extra"},
+    {id:"3-7",t:"AI/ML: decision trees, random forests — implement and tune",c:"extra"},
+    {id:"3-8",t:"AI Agents: ReAct loop, tool-calling, function calling",c:"extra"},
+    {id:"3-9",t:"LeetCode: sliding window & binary search — 10 problems",c:"extra"},
   ]},
-  {id:4,n:"04",title:"Product mind",sub:"Product thinking & teardown",out:"Project 3 — Product teardown deck complete",tasks:[
-    {id:"4-1",t:"Study CIRCLES framework, jobs-to-be-done, north star metric",cat:"core"},
-    {id:"4-2",t:"Complete 12–15 slide product teardown deck (Zerodha/Notion/Swiggy)",cat:"core"},
-    {id:"4-3",t:"Learn Power BI or Tableau — basics to intermediate",cat:"core"},
-    {id:"4-4",t:"roadmap.sh: product analytics section complete",cat:"core"},
-    {id:"4-5",t:"AI/ML: neural networks, backprop, activation functions — implement",cat:"extra"},
-    {id:"4-6",t:"AI Agents: build a simple agent with LangChain or CrewAI",cat:"extra"},
-    {id:"4-7",t:"LeetCode: trees & graphs — 10 easy-medium problems",cat:"extra"},
-    {id:"4-8",t:"LinkedIn outreach: connect with 20+ professionals this month",cat:"habit"},
+  {id:4,n:"04",title:"Product mind",sub:"Full PRD + prioritization + Power BI",out:"Project 4 started · Full PRD complete",tasks:[
+    {id:"4-1",t:"RICE, MoSCoW, opportunity scoring — practice on 5 real scenarios",c:"product"},
+    {id:"4-2",t:"Write a full PRD (5+ pages): problem, users, solution, metrics, risks",c:"product"},
+    {id:"4-3",t:"Figma: complete a 6–8 screen mid-fidelity prototype",c:"product"},
+    {id:"4-4",t:"AARRR funnel, cohort analysis, LTV/CAC, DAU/MAU — deep dive",c:"analyst"},
+    {id:"4-5",t:"Power BI / Tableau: build an interactive dashboard from scratch",c:"analyst"},
+    {id:"4-6",t:"roadmap.sh: product analytics + BI tools sections",c:"analyst"},
+    {id:"4-7",t:"AI/ML: neural networks, backprop — build a simple classifier",c:"extra"},
+    {id:"4-8",t:"AI Agents: build a basic agent with LangChain or CrewAI",c:"extra"},
+    {id:"4-9",t:"LinkedIn: connect with 20+ PMs and analysts at target companies",c:"habit"},
   ]},
-  {id:5,n:"05",title:"Growth engine",sub:"Growth metrics & experiments",out:"Project 4 — Growth case study complete",tasks:[
-    {id:"5-1",t:"Master AARRR funnel, cohort retention, LTV/CAC, DAU/MAU",cat:"core"},
-    {id:"5-2",t:"Write Swiggy user retention growth case study",cat:"core"},
-    {id:"5-3",t:"Design 3 A/B experiment hypotheses with estimated impact",cat:"core"},
-    {id:"5-4",t:"Stats: A/B testing, p-values, confidence intervals, statistical power",cat:"extra"},
-    {id:"5-5",t:"AI/ML: CNNs, RNNs, Transformers — concept + hands-on implementation",cat:"extra"},
-    {id:"5-6",t:"AI Agents: multi-agent orchestration, memory, RAG basics",cat:"extra"},
-    {id:"5-7",t:"LeetCode: dynamic programming — 10 easy-medium problems",cat:"extra"},
-    {id:"5-8",t:"LinkedIn: 5 outreach messages/week, target 2 coffee chats",cat:"habit"},
+  {id:5,n:"05",title:"Growth engine",sub:"Growth case + A/B testing + stakeholder comms",out:"Project 4 complete · 10 mocks done",tasks:[
+    {id:"5-1",t:"Write growth case study: user funnel, drop-offs, experiments, impact",c:"product"},
+    {id:"5-2",t:"Design 3 A/B experiment hypotheses with success metrics + impact estimate",c:"product"},
+    {id:"5-3",t:"Write a strategy memo (1-pager) defending a product decision",c:"strategy"},
+    {id:"5-4",t:"Stats: A/B testing, p-values, confidence intervals, statistical power",c:"extra"},
+    {id:"5-5",t:"AI/ML: transformers, LLMs — conceptual understanding + fine-tuning basics",c:"extra"},
+    {id:"5-6",t:"AI Agents: multi-agent orchestration, RAG, memory",c:"extra"},
+    {id:"5-7",t:"LeetCode: dynamic programming — 10 problems",c:"extra"},
+    {id:"5-8",t:"Mock interviews: 5 product design + 5 analytics rounds",c:"habit"},
   ]},
-  {id:6,n:"06",title:"Launch mode",sub:"Resume, portfolio & interviews",out:"Placement ready",tasks:[
-    {id:"6-1",t:"Build Notion portfolio — all 4 projects polished and linked",cat:"core"},
-    {id:"6-2",t:"Write evidence-based resume — specific numbers, zero fluff",cat:"core"},
-    {id:"6-3",t:"Complete 10 mock interviews (product, analytics, guesstimate)",cat:"core"},
-    {id:"6-4",t:"Research and target 20+ companies — personalized notes",cat:"core"},
-    {id:"6-5",t:"Apply to 30+ roles via LinkedIn, startup boards, referrals",cat:"core"},
-    {id:"6-6",t:"AI/ML: complete end-to-end ML project for portfolio",cat:"extra"},
-    {id:"6-7",t:"AI Agents: showcase agent project — demo ready",cat:"extra"},
-    {id:"6-8",t:"LeetCode: SQL coding rounds + mock technical screens",cat:"extra"},
+  {id:6,n:"06",title:"Launch mode",sub:"Portfolio + resume + 30 mocks + apply",out:"Placement ready · Applied to 30+ roles",tasks:[
+    {id:"6-1",t:"Notion portfolio: all 4 projects live, polished, outcomes shown",c:"product"},
+    {id:"6-2",t:"Resume: evidence-based, specific numbers, tailored per role type",c:"habit"},
+    {id:"6-3",t:"Complete 30 total mocks: product design, analytics case, guesstimate",c:"habit"},
+    {id:"6-4",t:"Research 20+ target companies — note their product bets and strategy",c:"strategy"},
+    {id:"6-5",t:"Apply to 30+ roles via LinkedIn, startup boards, Wellfound, referrals",c:"habit"},
+    {id:"6-6",t:"AI/ML: finalize end-to-end ML project for portfolio",c:"extra"},
+    {id:"6-7",t:"AI Agents: demo-ready agent project on portfolio",c:"extra"},
+    {id:"6-8",t:"STAR stories: 5 behavioral answers covering quantified impact",c:"product"},
   ]},
 ];
-
-const PROJECTS = [
-  {id:1,span:"Months 1–2",title:"E-commerce sales analysis",type:"Data analysis",col:"#4a9eff",tasks:[
-    "Download and explore retail dataset from Kaggle or public source",
-    "Clean data: handle nulls, fix data types, remove duplicates",
-    "Write 10+ SQL queries to surface revenue patterns and segments",
-    "Build Excel/Power BI dashboard with 4+ visualizations",
-    "Write 5–8 business insights formatted as a report",
+const PROJECTS=[
+  {id:1,span:"Months 1–2",title:"E-commerce sales analysis",type:"Analyst track",col:"#e8960a",tracks:["analyst"],out:"SQL queries + Excel dashboard + business insights report",tasks:[
+    "Download retail dataset (Kaggle or public source)",
+    "Clean data: nulls, type fixes, deduplication",
+    "Write 10+ SQL queries surfacing revenue and segment patterns",
+    "Build dashboard with 4+ visualizations",
+    "Write 5–8 business insights as a decision memo",
   ]},
-  {id:2,span:"Months 2–3",title:"AI skincare industry analysis",type:"Market research",col:"#a78bfa",tasks:[
-    "Estimate TAM, SAM, SOM for AI skincare market",
-    "Profile 5+ competitors: positioning, pricing, moat",
-    "Map pricing models across major players",
-    "Identify 3+ white-space / opportunity gaps",
-    "Write polished 10–12 page industry report",
-  ]},
-  {id:3,span:"Months 3–4",title:"Product teardown deck",type:"Product thinking",col:"#f472b6",tasks:[
-    "Pick product: Zerodha, Notion, Swiggy, or Spotify",
+  {id:2,span:"Months 2–3",title:"Product teardown — Zerodha or Meesho",type:"Product + Strategy",col:"#3d8ef0",tracks:["product","strategy"],out:"12–15 slide deck · publish on LinkedIn",tasks:[
     "Define target users and core jobs-to-be-done",
     "Map key features and primary user flows",
-    "Analyze monetization model in detail",
-    "Identify 3 specific improvements with reasoning",
+    "Analyze the monetization model in depth",
+    "Competitive positioning analysis",
+    "Identify 3 improvements with reasoning + mock wireframe",
     "Build 12–15 polished slides",
   ]},
-  {id:4,span:"Month 5",title:"Swiggy user retention case study",type:"Growth case",col:"#00c97a",tasks:[
-    "Map Swiggy's complete user acquisition to retention funnel",
-    "Identify top 3 drop-off points with data-backed reasoning",
-    "Design 3 A/B experiment hypotheses with clear success metrics",
-    "Estimate retention lift and estimated revenue impact",
-    "Write final growth case study document",
+  {id:3,span:"Months 2–3",title:"Market research report",type:"Strategy track",col:"#8b5cf6",tracks:["strategy"],out:"10–12 page report — proves strategy thinking",tasks:[
+    "Estimate TAM/SAM/SOM with India-specific data",
+    "Profile 5+ competitors: positioning, pricing, moat",
+    "Map pricing and distribution models",
+    "Identify 3+ white-space opportunities with evidence",
+    "Write polished report with executive summary",
+  ]},
+  {id:4,span:"Months 4–5",title:"Full PRD + growth case study",type:"Product track",col:"#e879a0",tracks:["product","analyst"],out:"PRD doc + growth case study — core PM portfolio pieces",tasks:[
+    "Pick a real product problem at a target company",
+    "Write full PRD: problem, users, solution, metrics, risks",
+    "Build 3-screen Figma wireframe for the feature",
+    "Write growth case: funnel, drop-off, experiments, impact",
+    "Package as a Notion page with visuals",
   ]},
 ];
-
-const SKILLS = [
-  {id:"sql",l:"SQL",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
-  {id:"excel",l:"Advanced Excel",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
-  {id:"data_i",l:"Data interpretation",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
-  {id:"prob_s",l:"Structured problem solving",t:"P1 — Non-negotiable",p:1,col:"#f0a000"},
-  {id:"prod_t",l:"Product thinking",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
-  {id:"mkt_r",l:"Market research",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
-  {id:"biz_m",l:"Business model analysis",t:"P2 — Differentiator",p:2,col:"#a78bfa"},
-  {id:"python",l:"Python for data",t:"P3 — If time permits",p:3,col:"#4a9eff"},
-  {id:"bi",l:"Power BI / Tableau",t:"P3 — If time permits",p:3,col:"#4a9eff"},
-  {id:"figma",l:"Figma (basic)",t:"P3 — If time permits",p:3,col:"#4a9eff"},
-  {id:"ml_c",l:"AI/ML core theory",t:"Extra — strong edge",p:4,col:"#f472b6"},
-  {id:"ml_i",l:"ML implementation",t:"Extra — strong edge",p:4,col:"#f472b6"},
-  {id:"agents",l:"AI Agents",t:"Extra — future-proof",p:4,col:"#f472b6"},
-  {id:"lcode",l:"LeetCode / DSA",t:"Extra — tech + analytics",p:4,col:"#f472b6"},
-  {id:"stats",l:"Statistics & maths",t:"Extra — foundation",p:4,col:"#f472b6"},
+const SKILLS=[
+  {id:"sql",l:"SQL",t:"Analyst · P1",p:1,col:"#e8960a"},
+  {id:"excel",l:"Advanced Excel",t:"Analyst · P1",p:1,col:"#e8960a"},
+  {id:"data_i",l:"Data interpretation",t:"Analyst · P1",p:1,col:"#e8960a"},
+  {id:"metrics",l:"Metrics & funnels",t:"Analyst · P1",p:1,col:"#e8960a"},
+  {id:"prod_t",l:"Product thinking",t:"Product · P1",p:2,col:"#3d8ef0"},
+  {id:"prd",l:"PRD writing",t:"Product · P1",p:2,col:"#3d8ef0"},
+  {id:"figma",l:"Figma (wireframing)",t:"Product · P1",p:2,col:"#3d8ef0"},
+  {id:"user_r",l:"User research",t:"Product · P1",p:2,col:"#3d8ef0"},
+  {id:"mkt_r",l:"Market research",t:"Strategy · P2",p:3,col:"#8b5cf6"},
+  {id:"biz_m",l:"Business model analysis",t:"Strategy · P2",p:3,col:"#8b5cf6"},
+  {id:"frm",l:"Frameworks (SWOT, 5 Forces)",t:"Strategy · P2",p:3,col:"#8b5cf6"},
+  {id:"python",l:"Python for data",t:"Extra",p:4,col:"#e879a0"},
+  {id:"bi",l:"Power BI / Tableau",t:"Extra",p:4,col:"#e879a0"},
+  {id:"ml_c",l:"AI/ML core",t:"Extra",p:4,col:"#e879a0"},
+  {id:"agents",l:"AI Agents",t:"Extra",p:4,col:"#e879a0"},
+  {id:"stats",l:"Statistics & maths",t:"Extra",p:4,col:"#e879a0"},
+  {id:"lcode",l:"LeetCode / DSA",t:"Extra",p:4,col:"#e879a0"},
 ];
-
-const LEVELS = [
+const QS={
+  pm:[
+    {q:"Design a product for students in Tier 2 Indian cities to learn skills.",h:"Users → problem → solution → metrics → tradeoffs"},
+    {q:"How would you improve Meesho's seller experience?",h:"Start with the seller's journey, find friction, prioritize one fix"},
+    {q:"Google wants to enter the Indian UPI space. What would you build?",h:"Competitive landscape first, then product angle, then GTM"},
+    {q:"Your app's DAU dropped 20% overnight. What do you do?",h:"Diagnose before solving: platform? feature? segment? external?"},
+    {q:"Design a feature for Zerodha to increase first-time investor retention.",h:"Define 'retain' precisely before jumping to solutions"},
+    {q:"How would you prioritize 10 feature requests with limited bandwidth?",h:"Use RICE or MoSCoW — show the framework before applying it"},
+    {q:"What north star metric would you use for a D2C skincare brand?",h:"Revenue ≠ north star — think about the core user behavior"},
+    {q:"Design a product for gig workers in India to manage their income.",h:"Deep user empathy first — the life of a gig worker is specific"},
+  ],
+  an:[
+    {q:"How would you measure the success of Swiggy's new loyalty program?",h:"Define success before metrics: retention? orders? LTV?"},
+    {q:"Razorpay's payment success rate dropped 3%. How do you investigate?",h:"Segment: merchant type, payment method, region, time of day"},
+    {q:"Walk me through a SQL query to find the top 10% of users by spend.",h:"Window function: NTILE(10) or percentile_cont"},
+    {q:"An A/B test shows +4% conversion but -2% avg order value. Ship it?",h:"Calculate net revenue impact first, then check statistical significance"},
+    {q:"How would you build a dashboard to track D2C brand health?",h:"5 metrics max — explain why each one matters"},
+    {q:"Define and calculate CAC and LTV for a subscription edtech product.",h:"LTV = ARPU × gross margin / churn — walk through each term"},
+    {q:"SQL: find users who were active in month 1 but churned by month 2.",h:"Cohort table → LEFT JOIN on month 2 activity → NULL = churned"},
+  ],
+  st:[
+    {q:"Should Mamaearth expand into men's grooming? Make a recommendation.",h:"Market size → competitive position → capability fit → risk"},
+    {q:"Estimate the revenue opportunity for quick commerce in India in 2027.",h:"Bottom-up: households × frequency × AOV × margin"},
+    {q:"A Series B D2C brand wants to launch in offline retail. Good idea?",h:"Channel conflict, margin math, brand dilution — cover all three"},
+    {q:"How would you help Zerodha defend against Groww's market share gains?",h:"Segment users: who is actually switching, and why?"},
+    {q:"Razorpay wants to enter Southeast Asia. How do you evaluate it?",h:"PESTEL + competitive mapping + Razorpay's actual moat"},
+    {q:"What's your recommendation on how Meta should grow in India?",h:"India ≠ rest of world — vernacular, feature phones, trust"},
+  ],
+  gs:[
+    {q:"Estimate the number of coffee cups sold in Mumbai every day.",h:"Population → % coffee drinkers → frequency → cups per visit"},
+    {q:"How many WhatsApp messages are sent in India per hour?",h:"MAU × daily messages / 24"},
+    {q:"Estimate Swiggy's GMV for a single day in Bangalore.",h:"Restaurants × orders/day × AOV × Swiggy's market share"},
+    {q:"How many Zerodha accounts are opened every month?",h:"Market growth rate + TAM penetration + seasonality"},
+    {q:"Estimate the market size of Indian online gaming.",h:"Payers × ARPU — split casual vs real-money gaming"},
+    {q:"How many liters of milk are consumed in India per day?",h:"Per capita × population — urban/rural split matters"},
+  ],
+};
+const LEVELS=[
   {lv:1,t:"Curious beginner",min:0,max:300},
   {lv:2,t:"Aspiring analyst",min:300,max:700},
-  {lv:3,t:"Junior analyst",min:700,max:1200},
-  {lv:4,t:"Competent analyst",min:1200,max:2000},
-  {lv:5,t:"Market-ready",min:2000,max:3000},
-  {lv:6,t:"Placement ready",min:3000,max:3001},
+  {lv:3,t:"Junior analyst",min:700,max:1400},
+  {lv:4,t:"Competent analyst",min:1400,max:2400},
+  {lv:5,t:"Market-ready",min:2400,max:3600},
+  {lv:6,t:"Placement ready",min:3600,max:3601},
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-let S = {
-  checked: {},
-  projDone: {},
-  skills: {},
-  companies: [],
-  hoursLog: [],
-  xp: 0,
-  openMonth: null,
-};
+let S={checked:{},projDone:{},skills:{},companies:[],hoursLog:[],ivs:{pm:0,an:0,gs:0},xp:0,openMonth:null};
+function load(){try{const r=localStorage.getItem('mhq_v4');if(r)Object.assign(S,JSON.parse(r));}catch(e){}}
+function save(){try{localStorage.setItem('mhq_v4',JSON.stringify(S));}catch(e){}}
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem('mhq_v3');
-    if (raw) Object.assign(S, JSON.parse(raw));
-  } catch(e) {}
-}
-
-function saveState() {
-  try { localStorage.setItem('mhq_v3', JSON.stringify(S)); } catch(e) {}
-}
-
-// ============================================================
-// XP / LEVELS
-// ============================================================
-function getLevelInfo() {
-  for (let i = LEVELS.length - 1; i >= 0; i--) {
-    if (S.xp >= LEVELS[i].min) {
-      const l = LEVELS[i], nx = LEVELS[i+1];
-      const pct = nx ? Math.min(100, Math.round(((S.xp - l.min) / (nx.min - l.min)) * 100)) : 100;
-      return { ...l, pct, nmin: nx?.min ?? l.min, left: nx ? Math.max(0, nx.min - S.xp) : 0 };
+function lvInfo(){
+  for(let i=LEVELS.length-1;i>=0;i--){
+    if(S.xp>=LEVELS[i].min){
+      const l=LEVELS[i],nx=LEVELS[i+1];
+      const pct=nx?Math.min(100,Math.round(((S.xp-l.min)/(nx.min-l.min))*100)):100;
+      return{...l,pct,nmin:nx?.min??l.min,left:nx?Math.max(0,nx.min-S.xp):0};
     }
   }
-  return { ...LEVELS[0], pct: 0, nmin: LEVELS[1].min, left: LEVELS[1].min };
+  return{...LEVELS[0],pct:0,nmin:LEVELS[1].min,left:LEVELS[1].min};
 }
 
-function updateSidebar() {
-  const li = getLevelInfo();
-  document.getElementById('sb-lv').textContent = `Lv ${li.lv}`;
-  document.getElementById('sb-title').textContent = li.t;
-  document.getElementById('sb-bar').style.width = li.pct + '%';
-  document.getElementById('sb-xp').textContent = S.xp.toLocaleString();
-  document.getElementById('sb-pct').textContent = li.pct + '%';
-  document.getElementById('sb-next').textContent = li.nmin.toLocaleString();
+function updateSB(){
+  const li=lvInfo();
+  document.getElementById('sb-lv').textContent='Lv '+li.lv;
+  document.getElementById('sb-name').textContent=li.t;
+  document.getElementById('sb-bar').style.width=li.pct+'%';
+  document.getElementById('sb-xp').textContent=S.xp.toLocaleString()+' XP';
+  document.getElementById('sb-pct').textContent=li.pct+'%';
+  document.getElementById('sb-max').textContent=li.nmin.toLocaleString();
 }
 
-// ============================================================
-// STATS
-// ============================================================
-function getStats() {
-  const allTasks = MONTHS.flatMap(m => m.tasks);
-  const done = allTasks.filter(t => S.checked[t.id]).length;
-  const allProj = PROJECTS.flatMap(p => p.tasks.map((_, i) => `${p.id}-${i}`));
-  const projDone = allProj.filter(k => S.projDone[k]).length;
-  const totalH = S.hoursLog.reduce((s, e) => s + (e.l||0) + (e.p||0), 0);
-  const pct = Math.round((done / allTasks.length) * 100);
-  const focusMonth = MONTHS.find(m => m.tasks.some(t => !S.checked[t.id])) || MONTHS[5];
-  return { done, total: allTasks.length, pct, projDone, projTotal: allProj.length,
-    projPct: Math.round((projDone / allProj.length) * 100),
-    co: S.companies.length, totalH: Math.round(totalH * 10) / 10,
-    focusMonth };
+function getStats(){
+  const at=MONTHS.flatMap(m=>m.tasks);
+  const td=at.filter(t=>S.checked[t.id]).length;
+  const ap=PROJECTS.flatMap(p=>p.tasks.map((_,i)=>`${p.id}-${i}`));
+  const pd=ap.filter(k=>S.projDone[k]).length;
+  const th=S.hoursLog.reduce((s,e)=>s+(e.l||0)+(e.p||0),0);
+  const ivT=(S.ivs.pm||0)+(S.ivs.an||0)+(S.ivs.gs||0);
+  const pct=Math.round((td/at.length)*100);
+  const fm=MONTHS.find(m=>m.tasks.some(t=>!S.checked[t.id]))||MONTHS[5];
+  return{td,tt:at.length,pct,pd,pt:ap.length,ppct:Math.round((pd/ap.length)*100),co:S.companies.length,th:Math.round(th*10)/10,ivT,fm};
 }
 
-function updateNavBadges() {
-  const st = getStats();
-  document.getElementById('nb-roadmap').textContent = st.pct + '%';
-  document.getElementById('nb-projects').textContent = st.projPct + '%';
-  const avgSkill = SKILLS.length ? Math.round(SKILLS.reduce((s,sk) => s + (S.skills[sk.id]||0), 0) / SKILLS.length) : 0;
-  document.getElementById('nb-skills').textContent = avgSkill + '%';
-  document.getElementById('nb-log').textContent = st.totalH + 'h';
+function updateBadges(){
+  const st=getStats();
+  document.getElementById('nb-road').textContent=st.pct+'%';
+  document.getElementById('nb-proj').textContent=st.ppct+'%';
+  const avgSk=SKILLS.length?Math.round(SKILLS.reduce((s,sk)=>s+(S.skills[sk.id]||0),0)/SKILLS.length):0;
+  document.getElementById('nb-skill').textContent=avgSk+'%';
+  document.getElementById('nb-iv').textContent=st.ivT+'/30';
+  document.getElementById('nb-log').textContent=st.th+'h';
 }
 
-// ============================================================
-// TOAST
-// ============================================================
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+let toastT;
+function toast(m){
+  const el=document.getElementById('toast');
+  el.textContent=m;el.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2800);
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
-function renderDashboard() {
-  const st = getStats();
-  document.getElementById('ds-tasks').textContent = `${st.done}/${st.total}`;
-  document.getElementById('ds-tasks-sub').textContent = st.pct + '% complete';
-  document.getElementById('ds-proj').textContent = st.projPct + '%';
-  document.getElementById('ds-proj-sub').textContent = `${st.projDone}/${st.projTotal} complete`;
-  document.getElementById('ds-co').textContent = st.co;
-  document.getElementById('ds-hours').textContent = st.totalH + 'h';
-  document.getElementById('dash-pct').textContent = st.pct + '%';
-  document.getElementById('dash-xp').textContent = S.xp.toLocaleString();
-
-  const subs = ["Just getting started","Building momentum","Halfway there — don't stop","Solid progress, keep going","Almost there, final push!","Mission complete!"];
-  const si = Math.min(5, Math.floor(st.pct / 20));
-  document.getElementById('dash-pct-sub').textContent = subs[si];
-
-  // Month bars
-  const barsEl = document.getElementById('dash-month-bars');
-  barsEl.innerHTML = MONTHS.map(m => {
-    const d = m.tasks.filter(t => S.checked[t.id]).length;
-    const p = Math.round((d / m.tasks.length) * 100);
-    const col = p === 100 ? 'var(--green)' : d > 0 ? 'var(--amber)' : 'var(--dim)';
-    return `<div class="mbar-row">
-      <div class="mbar-lbl">${m.n}</div>
-      <div class="mbar-wrap"><div class="mbar-fill" style="width:${p}%;background:${col};"></div></div>
-      <div class="mbar-pct">${p}%</div>
-    </div>`;
+function renderDash(){
+  const st=getStats();
+  const subs=["Just getting started","Building momentum","Halfway — don't stop","Solid progress","Almost there!","Mission complete!"];
+  document.getElementById('d-pct').textContent=st.pct+'%';
+  document.getElementById('d-sub').textContent=subs[Math.min(5,Math.floor(st.pct/20))];
+  document.getElementById('d-xp').textContent=S.xp.toLocaleString();
+  document.getElementById('d-stats').innerHTML=`
+    <div class="sc a"><div class="sc-v">${st.td}/${st.tt}</div><div class="sc-l">Tasks done</div><div class="sc-s">${st.pct}% complete</div></div>
+    <div class="sc b"><div class="sc-v">${st.ppct}%</div><div class="sc-l">Project milestones</div><div class="sc-s">${st.pd}/${st.pt} done</div></div>
+    <div class="sc g"><div class="sc-v">${st.ivT}</div><div class="sc-l">Mock interviews</div><div class="sc-s">Target: 30</div></div>
+    <div class="sc p"><div class="sc-v">${st.co}</div><div class="sc-l">Companies analyzed</div><div class="sc-s">Target: 25</div></div>
+    <div class="sc pk"><div class="sc-v">${st.th}h</div><div class="sc-l">Hours logged</div><div class="sc-s">Target: 15/week</div></div>`;
+  document.getElementById('d-bars').innerHTML=MONTHS.map(m=>{
+    const d=m.tasks.filter(t=>S.checked[t.id]).length;
+    const p=Math.round((d/m.tasks.length)*100);
+    const c=p===100?'var(--green)':d>0?'var(--amber)':'var(--b3)';
+    return`<div class="mbr"><div class="mbr-l">${m.n}</div><div class="mbr-w"><div class="mbr-f" style="width:${p}%;background:${c}"></div></div><div class="mbr-p">${p}%</div></div>`;
   }).join('');
-
-  // Focus month
-  const fm = st.focusMonth;
-  document.getElementById('dash-focus-lbl').textContent = `Current focus — Month ${fm.id}`;
-  document.getElementById('dash-month-title').textContent = fm.title;
-  document.getElementById('dash-month-sub').textContent = fm.sub;
-
-  const nextTasks = fm.tasks.filter(t => !S.checked[t.id]).slice(0, 4);
-  document.getElementById('dash-nextup').innerHTML = nextTasks.length
-    ? nextTasks.map(t => `<div class="next-task"><div class="next-arrow">→</div><div style="flex:1;">${t.t}</div></div>`).join('')
-    : `<div style="font-size:13px;color:var(--green);">All tasks in this month complete.</div>`;
+  const fm=st.fm;
+  document.getElementById('d-focus-lbl').textContent=`Current focus — Month ${fm.id}`;
+  document.getElementById('d-m-title').textContent=fm.title;
+  document.getElementById('d-m-sub').textContent=fm.sub;
+  const nt=fm.tasks.filter(t=>!S.checked[t.id]).slice(0,4);
+  document.getElementById('d-nextup').innerHTML=nt.length
+    ?nt.map(t=>`<div class="nt"><div class="nt-a">→</div><div>${t.t}</div></div>`).join('')
+    :`<div style="font-size:13px;color:var(--green)">All tasks complete.</div>`;
 }
 
-// ============================================================
-// ROADMAP
-// ============================================================
-function renderRoadmap() {
-  const el = document.getElementById('roadmap-list');
-  el.innerHTML = MONTHS.map(m => {
-    const done = m.tasks.filter(t => S.checked[t.id]).length;
-    const pct = Math.round((done / m.tasks.length) * 100);
-    const isOpen = S.openMonth === m.id;
-    const isComplete = pct === 100;
-    const pctCol = isComplete ? 'var(--green)' : done > 0 ? 'var(--amber)' : 'var(--dim)';
-
-    const tasksHTML = m.tasks.map(t => {
-      const ck = S.checked[t.id];
-      const catCol = {core:'', extra:'color:var(--purple)', habit:'color:var(--blue)'}[t.cat] || '';
-      return `<div class="task-row${ck?' done':''}" data-chk="${t.id}">
-        <div class="task-check${ck?' on':''}">✓</div>
-        <div class="task-text" style="${catCol}">${t.t}</div>
-        <div class="task-xp">+10</div>
-      </div>`;
-    }).join('');
-
-    return `<div class="month-block${isOpen?' open':''}${isComplete?' complete':''}">
-      <div class="month-header" data-exp="${m.id}">
-        <div class="month-num">${m.n}</div>
-        <div class="month-info">
-          <div class="month-title">${m.title}${isComplete?`<span class="done-chip">complete</span>`:''}</div>
-          <div class="month-sub">${m.sub}</div>
+function renderRoad(){
+  document.getElementById('road-list').innerHTML=MONTHS.map(m=>{
+    const done=m.tasks.filter(t=>S.checked[t.id]).length;
+    const pct=Math.round((done/m.tasks.length)*100);
+    const isOpen=S.openMonth===m.id,isComplete=pct===100;
+    const pc=isComplete?'var(--green)':done>0?'var(--amber)':'var(--b3)';
+    return`<div class="mb${isOpen?' open':''}${isComplete?' done-m':''}">
+      <div class="mb-hdr" data-exp="${m.id}">
+        <div class="mb-num">${m.n}</div>
+        <div class="mb-info">
+          <div class="mb-title">${m.title}${isComplete?`<span class="done-chip">complete</span>`:''}</div>
+          <div class="mb-sub">${m.sub}</div>
         </div>
-        <div class="month-right">
-          <div class="month-pct" style="color:${pctCol};">${pct}%</div>
-          <div class="month-count">${done}/${m.tasks.length} tasks</div>
-        </div>
-        <div class="month-caret">${isOpen?'▲':'▼'}</div>
+        <div class="mb-right"><div class="mb-pct" style="color:${pc}">${pct}%</div><div class="mb-cnt">${done}/${m.tasks.length}</div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t4);margin-left:8px;">${isOpen?'▲':'▼'}</div>
       </div>
-      <div class="prog-wrap" style="margin:0;border-radius:0;"><div class="prog-fill" style="width:${pct}%;background:${isComplete?'var(--green)':'var(--amber)'};"></div></div>
-      <div class="month-body">
-        <div class="outcome-tag">Outcome: ${m.out}</div>
-        ${tasksHTML}
+      <div class="pb" style="margin:0;border-radius:0;height:3px;"><div class="pf" style="width:${pct}%;background:${isComplete?'var(--green)':'var(--amber)'}"></div></div>
+      <div class="mb-body">
+        <div class="mb-out">→ Outcome: ${m.out}</div>
+        ${m.tasks.map(t=>{const ck=S.checked[t.id];return`<div class="tr${ck?' done':''}" data-chk="${t.id}"><div class="tr-ck${ck?' on':''}">✓</div><div class="tr-txt"><span class="tp tp-${t.c}">${t.c}</span>${t.t}</div><div class="tr-xp">+10</div></div>`;}).join('')}
       </div>
     </div>`;
   }).join('');
-
-  // bind
-  el.querySelectorAll('[data-chk]').forEach(row => {
-    row.onclick = () => {
-      const id = row.dataset.chk;
-      const was = S.checked[id];
-      S.checked[id] = !was;
-      if (!was) { S.xp += 10; toast('+10 XP — task checked off!'); }
-      else { S.xp = Math.max(0, S.xp - 10); }
-      updateAll(); saveState();
-    };
+  document.querySelectorAll('[data-chk]').forEach(row=>{
+    row.onclick=()=>{const id=row.dataset.chk;const was=S.checked[id];S.checked[id]=!was;if(!was){S.xp+=10;toast('+10 XP — task done!');}else{S.xp=Math.max(0,S.xp-10);}save();updateAll();renderRoad();};
   });
-
-  el.querySelectorAll('[data-exp]').forEach(hdr => {
-    hdr.onclick = () => {
-      const id = parseInt(hdr.dataset.exp);
-      S.openMonth = S.openMonth === id ? null : id;
-      renderRoadmap();
-    };
+  document.querySelectorAll('[data-exp]').forEach(h=>{
+    h.onclick=()=>{const id=parseInt(h.dataset.exp);S.openMonth=S.openMonth===id?null:id;renderRoad();};
   });
 }
 
-// ============================================================
-// PROJECTS
-// ============================================================
-function renderProjects() {
-  const el = document.getElementById('projects-list');
-  el.innerHTML = PROJECTS.map(p => {
-    const done = p.tasks.filter((_, i) => S.projDone[`${p.id}-${i}`]).length;
-    const pct = Math.round((done / p.tasks.length) * 100);
-
-    const tasksHTML = p.tasks.map((task, i) => {
-      const key = `${p.id}-${i}`;
-      const ck = S.projDone[key];
-      return `<div class="task-row${ck?' done':''}" data-proj="${key}" style="padding:10px 0;">
-        <div class="task-check${ck?' on':''}" style="${ck?`background:${p.col};border-color:${p.col};color:#000;`:''}">✓</div>
-        <div class="task-text">${task}</div>
-        <div class="task-xp">+15</div>
-      </div>`;
-    }).join('');
-
-    return `<div class="proj-card">
-      <div class="proj-top" style="border-left-color:${p.col};">
-        <div class="proj-type" style="color:${p.col};">${p.type} · ${p.span}</div>
-        <div class="proj-title">${p.title}</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="prog-wrap" style="flex:1;margin:0;"><div class="prog-fill" style="width:${pct}%;background:${p.col};"></div></div>
-          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${p.col};flex-shrink:0;">${pct}%</div>
-        </div>
+function renderProj(){
+  document.getElementById('proj-list').innerHTML=PROJECTS.map(p=>{
+    const done=p.tasks.filter((_,i)=>S.projDone[`${p.id}-${i}`]).length;
+    const pct=Math.round((done/p.tasks.length)*100);
+    return`<div class="pj">
+      <div class="pj-top" style="border-left-color:${p.col}">
+        <div class="pj-type" style="color:${p.col}">${p.type}</div>
+        <div class="pj-title">${p.title}</div>
+        <div class="pj-span">${p.tracks.map(t=>`<span class="tp tp-${t}">${t}</span>`).join('')} &nbsp;${p.span}</div>
+        <div style="display:flex;align-items:center;gap:10px;"><div class="pb" style="flex:1;margin:0;"><div class="pf" style="width:${pct}%;background:${p.col}"></div></div><div style="font-family:var(--mono);font-size:12px;font-weight:700;color:${p.col};flex-shrink:0;">${pct}%</div></div>
       </div>
-      <div class="proj-tasks">${tasksHTML}</div>
+      <div class="pj-tasks">${p.tasks.map((task,i)=>{const k=`${p.id}-${i}`;const ck=S.projDone[k];return`<div class="tr${ck?' done':''}" data-proj="${k}" style="padding:9px 0;"><div class="tr-ck${ck?' on':''}" style="${ck?`background:${p.col};border-color:${p.col};color:#000`:''}">✓</div><div class="tr-txt">${task}</div><div class="tr-xp">+15</div></div>`;}).join('')}</div>
+      <div class="pj-out">Output: ${p.out}</div>
     </div>`;
   }).join('');
-
-  el.querySelectorAll('[data-proj]').forEach(row => {
-    row.onclick = () => {
-      const k = row.dataset.proj;
-      const was = S.projDone[k];
-      S.projDone[k] = !was;
-      if (!was) { S.xp += 15; toast('+15 XP — project milestone!'); }
-      else { S.xp = Math.max(0, S.xp - 15); }
-      updateAll(); saveState();
-    };
+  document.querySelectorAll('[data-proj]').forEach(row=>{
+    row.onclick=()=>{const k=row.dataset.proj;const was=S.projDone[k];S.projDone[k]=!was;if(!was){S.xp+=15;toast('+15 XP — milestone!');}else{S.xp=Math.max(0,S.xp-15);}save();updateAll();renderProj();};
   });
 }
 
-// ============================================================
-// SKILLS
-// ============================================================
-function renderSkills() {
-  const groups = [
-    {id:'skills-p1', items: SKILLS.filter(s=>s.p===1)},
-    {id:'skills-p2', items: SKILLS.filter(s=>s.p===2)},
-    {id:'skills-p3', items: SKILLS.filter(s=>s.p===3)},
-    {id:'skills-extra', items: SKILLS.filter(s=>s.p===4)},
+function renderSkills(){
+  const groups=[
+    {id:'sk-p1',label:'Analyst skills — your proof',items:SKILLS.filter(s=>s.p===1)},
+    {id:'sk-p2',label:'Product skills — your pitch',items:SKILLS.filter(s=>s.p===2)},
+    {id:'sk-p3',label:'Strategy skills — your edge',items:SKILLS.filter(s=>s.p===3)},
+    {id:'sk-ex',label:'Extra skills — your moat',items:SKILLS.filter(s=>s.p===4)},
   ];
-
-  groups.forEach(({id, items}) => {
-    const el = document.getElementById(id);
-    el.innerHTML = items.map(sk => {
-      const v = S.skills[sk.id] || 0;
-      return `<div class="skill-row">
-        <div class="skill-name">${sk.l}</div>
-        <div class="skill-tag">${sk.t}</div>
-        <input type="range" min="0" max="100" step="5" value="${v}" data-skill="${sk.id}" style="accent-color:${sk.col};">
-        <div class="skill-pct" id="spct-${sk.id}" style="color:${sk.col};">${v}%</div>
-      </div>`;
-    }).join('');
+  groups.forEach(({id,label,items})=>{
+    document.getElementById(id).innerHTML=`<div class="sk-sec">${label}</div>`+items.map(sk=>{const v=S.skills[sk.id]||0;return`<div class="sk-row"><div class="sk-name">${sk.l}</div><div class="sk-tag">${sk.t}</div><input type="range" min="0" max="100" step="5" value="${v}" data-skill="${sk.id}" style="accent-color:${sk.col}"><div class="sk-pct" id="spct-${sk.id}" style="color:${sk.col}">${v}%</div></div>`;}).join('');
   });
-
-  document.querySelectorAll('[data-skill]').forEach(inp => {
-    inp.oninput = e => {
-      const id = inp.dataset.skill;
-      const nv = parseInt(e.target.value);
-      const ov = S.skills[id] || 0;
-      S.skills[id] = nv;
-      const lbl = document.getElementById('spct-' + id);
-      if (lbl) lbl.textContent = nv + '%';
-      if (nv > ov && nv % 25 === 0) {
-        S.xp += 20;
-        toast(`+20 XP — ${SKILLS.find(s=>s.id===id)?.l} at ${nv}%!`);
-        updateSidebar();
-      }
-      saveState(); updateNavBadges();
-    };
+  document.querySelectorAll('[data-skill]').forEach(inp=>{
+    inp.oninput=e=>{const id=inp.dataset.skill;const nv=parseInt(e.target.value);const ov=S.skills[id]||0;S.skills[id]=nv;const lbl=document.getElementById('spct-'+id);if(lbl)lbl.textContent=nv+'%';if(nv>ov&&nv%25===0){S.xp+=20;toast(`+20 XP — ${SKILLS.find(s=>s.id===id)?.l} at ${nv}%!`);updateSB();}save();updateBadges();};
   });
 }
 
-// ============================================================
-// LOG
-// ============================================================
-function renderLog() {
-  const st = getStats();
-
-  // Hours list
-  const hEl = document.getElementById('hours-log-list');
-  if (S.hoursLog.length === 0) {
-    hEl.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0;">No sessions logged yet.</div>`;
-  } else {
-    hEl.innerHTML = S.hoursLog.slice(0, 8).map(e => `<div class="log-entry">
-      <div class="log-top">
-        <div class="log-date">${e.date}</div>
-        <div class="log-hours"><span style="color:var(--blue);">${e.l}h learn</span> + <span style="color:var(--purple);">${e.p}h project</span> = <span style="color:var(--amber);">${Math.round((e.l+e.p)*10)/10}h</span></div>
-      </div>
-    </div>`).join('');
-  }
-
-  // Company bar
-  const cp = Math.min(100, Math.round((S.companies.length / 25) * 100));
-  document.getElementById('co-count').textContent = `${S.companies.length} / 25`;
-  document.getElementById('co-bar').style.width = cp + '%';
-
-  // Company list
-  const cEl = document.getElementById('co-list');
-  if (S.companies.length === 0) {
-    cEl.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0;">Start with Zerodha, Swiggy, or Zomato.</div>`;
-  } else {
-    cEl.innerHTML = S.companies.slice(0, 8).map(co => `<div class="log-entry">
-      <div class="log-top">
-        <div style="font-size:13px;font-weight:700;">${co.name}</div>
-        <div class="log-date">${co.date}</div>
-      </div>
-      ${co.insight ? `<div class="log-insight">${co.insight}</div>` : ''}
-    </div>`).join('');
-  }
+function renderInterviews(){
+  document.getElementById('iv-pm').textContent=S.ivs.pm||0;
+  document.getElementById('iv-an').textContent=S.ivs.an||0;
+  document.getElementById('iv-gs').textContent=S.ivs.gs||0;
+  const total=(S.ivs.pm||0)+(S.ivs.an||0)+(S.ivs.gs||0);
+  const pct=Math.min(100,Math.round((total/30)*100));
+  document.getElementById('iv-lbl').textContent=`${total} / 30 mocks completed`;
+  document.getElementById('iv-pct').textContent=pct+'%';
+  document.getElementById('iv-bar').style.width=pct+'%';
+  const qHtml=arr=>arr.map(q=>`<div class="iq"><div class="iq-q">${q.q}</div><div class="iq-h">Hint: ${q.h}</div></div>`).join('');
+  document.getElementById('qs-pm').innerHTML=qHtml(QS.pm);
+  document.getElementById('qs-an').innerHTML=qHtml(QS.an);
+  document.getElementById('qs-st').innerHTML=qHtml(QS.st);
+  document.getElementById('qs-gs').innerHTML=qHtml(QS.gs);
 }
 
-// ============================================================
-// BIND LOG BUTTONS
-// ============================================================
-function bindLogButtons() {
-  document.getElementById('log-btn').onclick = () => {
-    const l = parseFloat(document.getElementById('log-l').value) || 0;
-    const p = parseFloat(document.getElementById('log-p').value) || 0;
-    if (!l && !p) { toast('Enter at least one value.'); return; }
-    const date = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-    S.hoursLog.unshift({date, l, p});
-    if (S.hoursLog.length > 30) S.hoursLog = S.hoursLog.slice(0, 30);
-    const bonus = Math.round((l + p) * 2);
-    S.xp += bonus;
+window.logIV=function(type){
+  S.ivs[type]=(S.ivs[type]||0)+1;S.xp+=20;
+  const names={pm:'product design',an:'analytics case',gs:'guesstimate'};
+  toast(`+20 XP — ${names[type]} mock logged!`);
+  save();updateAll();renderInterviews();
+};
+
+function renderLog(){
+  const th=S.hoursLog.reduce((s,e)=>s+(e.l||0)+(e.p||0),0);
+  document.getElementById('tot-h').textContent=Math.round(th*10)/10+'h total';
+  document.getElementById('h-log').innerHTML=S.hoursLog.length
+    ?S.hoursLog.slice(0,8).map(e=>`<div class="le"><div class="le-top"><div class="le-date">${e.date}</div><div style="font-family:var(--mono);font-size:10px;"><span style="color:var(--blue)">${e.l}h learn</span> + <span style="color:var(--purple)">${e.p}h project</span> = <span style="color:var(--amber)">${Math.round((e.l+e.p)*10)/10}h</span></div></div></div>`).join('')
+    :`<div style="font-size:12px;color:var(--t4);text-align:center;padding:10px 0">No sessions yet.</div>`;
+  const cp=Math.min(100,Math.round((S.companies.length/25)*100));
+  document.getElementById('co-cnt').textContent=`${S.companies.length} / 25`;
+  document.getElementById('co-bar').style.width=cp+'%';
+  const rc={product:'var(--blue)',analyst:'var(--amber)',strategy:'var(--purple)'};
+  document.getElementById('co-log').innerHTML=S.companies.length
+    ?S.companies.slice(0,8).map(co=>`<div class="le"><div class="le-top"><div class="le-name">${co.name} <span style="font-family:var(--mono);font-size:9px;color:${rc[co.role]||'var(--t3)'}">[${co.role||'general'}]</span></div><div class="le-date">${co.date}</div></div>${co.insight?`<div class="le-note">${co.insight}</div>`:''}</div>`).join('')
+    :`<div style="font-size:12px;color:var(--t4);text-align:center;padding:10px 0">Start with Zerodha or Razorpay.</div>`;
+}
+
+function bindLog(){
+  document.getElementById('log-btn').onclick=()=>{
+    const l=parseFloat(document.getElementById('log-l').value)||0;
+    const p=parseFloat(document.getElementById('log-p').value)||0;
+    if(!l&&!p){toast('Enter at least one value.');return;}
+    const date=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    S.hoursLog.unshift({date,l,p});if(S.hoursLog.length>30)S.hoursLog=S.hoursLog.slice(0,30);
+    const bonus=Math.round((l+p)*2);S.xp+=bonus;
     toast(`+${bonus} XP — ${Math.round((l+p)*10)/10}h logged!`);
-    document.getElementById('log-l').value = '';
-    document.getElementById('log-p').value = '';
-    updateAll(); saveState(); renderLog();
+    document.getElementById('log-l').value='';document.getElementById('log-p').value='';
+    save();updateAll();renderLog();
   };
-
-  document.getElementById('co-btn').onclick = () => {
-    const name = document.getElementById('co-name').value.trim();
-    if (!name) { toast('Enter a company name.'); return; }
-    const insight = document.getElementById('co-insight').value.trim();
-    const date = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-    S.companies.unshift({name, insight, date});
-    S.xp += 25;
+  document.getElementById('co-btn').onclick=()=>{
+    const name=document.getElementById('co-n').value.trim();if(!name){toast('Enter a company name.');return;}
+    const insight=document.getElementById('co-i').value.trim();
+    const role=document.getElementById('co-role').value;
+    const date=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    S.companies.unshift({name,insight,role,date});S.xp+=25;
     toast(`+25 XP — ${name} analyzed!`);
-    document.getElementById('co-name').value = '';
-    document.getElementById('co-insight').value = '';
-    updateAll(); saveState(); renderLog();
+    document.getElementById('co-n').value='';document.getElementById('co-i').value='';
+    save();updateAll();renderLog();
   };
 }
 
-// ============================================================
-// TABS
-// ============================================================
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+const RENDERS={dash:renderDash,roadmap:renderRoad,projects:renderProj,skills:renderSkills,interviews:renderInterviews,log:renderLog};
+let curTab='dash';
 
-  if (tab === 'dashboard') renderDashboard();
-  if (tab === 'roadmap') renderRoadmap();
-  if (tab === 'projects') renderProjects();
-  if (tab === 'skills') renderSkills();
-  if (tab === 'log') renderLog();
-}
-
-document.querySelectorAll('[data-tab]').forEach(item => {
-  item.onclick = () => switchTab(item.dataset.tab);
+document.querySelectorAll('[data-tab]').forEach(item=>{
+  item.onclick=()=>{
+    curTab=item.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+    document.getElementById('tab-'+curTab).classList.add('on');
+    item.classList.add('on');
+    RENDERS[curTab]?.();
+  };
 });
 
-// ============================================================
-// UPDATE ALL
-// ============================================================
-function updateAll() {
-  updateSidebar();
-  updateNavBadges();
-  renderDashboard();
-}
+function updateAll(){updateSB();updateBadges();if(curTab==='dash')renderDash();}
 
-// ============================================================
-// INIT
-// ============================================================
-loadState();
-updateAll();
-renderRoadmap();
-bindLogButtons();
+load();
+updateSB();updateBadges();
+renderDash();renderRoad();renderProj();renderSkills();renderInterviews();renderLog();
+bindLog();
 </script>
 </body>
 </html>
